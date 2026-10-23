@@ -1598,6 +1598,194 @@
   padding: 25px;
 }
 
+.exam-question-card {
+  position: relative;
+}
+
+.exam-objective {
+  color: var(--muted);
+  font-size: 11px;
+  margin: 17px 0 -10px;
+}
+
+.exam-question-card .quiz-options button {
+  background: #fff;
+  color: #102b46;
+  font-size: 13px;
+  line-height: 1.5;
+  min-height: 62px;
+}
+
+.exam-question-card .quiz-options button > span {
+  background: #eaf5fc;
+  color: #102b46;
+}
+
+.exam-question-card .quiz-options .option-selected {
+  background: #eef8ff;
+  border-color: #20a4f3;
+}
+
+.exam-question-card .quiz-options .option-selected > span {
+  background: #20a4f3;
+  color: #fff;
+}
+
+.exam-navigation-controls {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 20px;
+}
+
+.exam-submit-button {
+  margin-left: auto;
+}
+
+.exam-question-jump {
+  border-top: 1px solid var(--line-soft);
+  display: grid;
+  gap: 7px;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  margin-top: 22px;
+  padding-top: 18px;
+}
+
+.exam-question-jump button {
+  aspect-ratio: 1;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: #102b46;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.exam-question-jump button.question-answered {
+  background: #eaf5fc;
+  border-color: #20a4f3;
+}
+
+.exam-question-jump button.question-current {
+  box-shadow: 0 0 0 2px #102b46;
+}
+
+.exam-submit-confirmation {
+  background: #fff;
+  border: 1px solid #20a4f3;
+  border-radius: 12px;
+  margin-top: 18px;
+  padding: 16px;
+}
+
+.exam-submit-confirmation > strong {
+  color: #102b46;
+  font-size: 14px;
+}
+
+.exam-submit-confirmation > p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.exam-submit-confirmation > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.result-category-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 22px auto 0;
+  max-width: 850px;
+}
+
+.result-category {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  display: grid;
+  gap: 7px;
+  padding: 14px;
+}
+
+.result-category strong {
+  color: #102b46;
+  font-size: 17px;
+}
+
+.result-category span {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.assessment-result > .exam-recommendations {
+  color: #102b46;
+  font-weight: 700;
+  margin-top: 18px;
+}
+
+.exam-review {
+  margin: 30px auto 0;
+  max-width: 920px;
+}
+
+.exam-review > .view-title {
+  margin-bottom: 15px;
+}
+
+.exam-review-item {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.exam-review-item summary {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  font-size: 12px;
+  gap: 14px;
+  justify-content: space-between;
+  line-height: 1.5;
+  padding: 13px 15px;
+}
+
+.exam-review-item summary b {
+  color: #102b46;
+  flex: 0 0 auto;
+  font-size: 10px;
+}
+
+.exam-review-content {
+  border-top: 1px solid var(--line-soft);
+  padding: 12px 15px;
+}
+
+.exam-review-content p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 7px 0;
+}
+
+.exam-review-content strong {
+  color: #102b46;
+}
+
+.exam-review-content small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
 .quiz-meta {
   align-items: center;
   display: flex;
@@ -2336,6 +2524,26 @@ footer {
 }
 
 @media (max-width: 620px) {
+  .exam-question-jump {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .result-category-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .exam-question-card .quiz-options {
+    grid-template-columns: 1fr;
+  }
+
+  .exam-submit-button {
+    margin-left: 0;
+  }
+
+  .exam-review-item summary {
+    align-items: flex-start;
+  }
+
   .page {
     padding: 22px 14px 40px;
   }
@@ -2587,6 +2795,7 @@ footer {
 .plan-field input:focus, .plan-field select:focus { outline: 2px solid #27866f55; border-color: #27866f; }
 .optional-label { color: var(--muted); font-weight: 400; }
 .plan-saved { color: #238362; font-size: 12px; margin: 0; }
+.plan-error { color: #a33a32; font-size: 12px; margin: 0; }
 .personal-plan-preview { align-self: start; }
 .plan-preview-copy { color: var(--muted); font-size: 12px; line-height: 1.65; }
 .exam-countdown { display: flex; align-items: baseline; gap: 8px; padding: 13px; margin: 16px 0; border-radius: 12px; background: var(--surface-soft, #f2f6f8); }

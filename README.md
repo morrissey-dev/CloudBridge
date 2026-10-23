@@ -21,7 +21,7 @@ CloudBridge brings learning and revision tools together in one platform, helping
 
 \- \*\*Learning Modules:\*\* Explore structured Azure Fundamentals learning content.
 
-\- \*\*Practice Quizzes:\*\* Test your understanding with practice questions.
+\- \*\*Practice Quizzes:\*\* Take one of three randomized, original 40-question AZ-900 practice exams with area-level scoring and answer review.
 
 \- \*\*Flashcards:\*\* Review key terms and concepts.
 
@@ -118,7 +118,7 @@ npm run build
 
 \## Progress and Data
 
-Learning progress is stored locally in the browser where supported by the application. It is not necessarily synchronised between different devices or browsers.
+Study plans and learning progress are stored locally in the browser where supported by the application. They are not necessarily synchronised between different devices or browsers.
 
 The first-visit welcome screen stores its completion flag separately in browser local storage; it does not replace or reset learning progress.
 

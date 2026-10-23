@@ -1,14 +1,17 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react"
+import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react"
 
 import {
 
   modules,
 
-  practiceQuestions,
-
   type CourseModule,
 
 } from "./curriculum"
+import {
+  az900ExamQuestions,
+  type AZ900Category,
+  type AZ900Question,
+} from "./az900Exam"
 
 type View =
 
@@ -430,7 +433,7 @@ function Sidebar({
 
               {item.label === "Practice quizzes" && (
 
-                <small>{practiceQuestions.length}</small>
+                <small>{az900ExamQuestions.length}</small>
 
               )}
 
@@ -623,9 +626,9 @@ function HomeView({
 
             <small>Knowledge checks</small>
 
-            <strong>3 practice exams · {practiceQuestions.length} questions</strong>
+            <strong>3 full exams · {az900ExamQuestions.length} questions each</strong>
 
-            <p>Original scenarios with a clear explanation after every answer.</p>
+            <p>Forty randomized AZ-900 questions with a complete results review.</p>
 
           </div>
 
@@ -1415,47 +1418,79 @@ function MyLearningView({
 }
 
 const practiceExams = [
-  { id: "exam-1", title: "Practice Exam 1", subtitle: "Cloud foundations & core Azure services", questions: practiceQuestions.slice(0, 10) },
-  { id: "exam-2", title: "Practice Exam 2", subtitle: "Architecture, security & governance", questions: practiceQuestions.slice(10, 20) },
-  { id: "exam-3", title: "Practice Exam 3", subtitle: "Mixed AZ-900 review", questions: practiceQuestions.slice(20, 30) },
+  { id: "exam-1", title: "Practice Exam 1", subtitle: "Full AZ-900 assessment · randomized questions" },
+  { id: "exam-2", title: "Practice Exam 2", subtitle: "Full AZ-900 assessment · randomized questions" },
+  { id: "exam-3", title: "Practice Exam 3", subtitle: "Full AZ-900 assessment · randomized questions" },
 ]
+
+type ExamQuestionAttempt = {
+  question: AZ900Question
+  options: string[]
+}
+
+const examCategories: AZ900Category[] = [
+  "Cloud concepts",
+  "Azure architecture and services",
+  "Azure management and governance",
+]
+
+const categoryModules: Record<AZ900Category, string[]> = {
+  "Cloud concepts": ["Cloud concepts"],
+  "Azure architecture and services": ["Azure architecture", "Azure services"],
+  "Azure management and governance": ["Governance & security"],
+}
+
+function shuffled<T>(items: readonly T[]): T[] {
+  const result = [...items]
+  for (let index = result.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1))
+    ;[result[index], result[swapIndex]] = [result[swapIndex], result[index]]
+  }
+  return result
+}
+
+function createExamAttempt(): ExamQuestionAttempt[] {
+  return shuffled(az900ExamQuestions).map((question) => ({
+    question,
+    options: shuffled(question.options),
+  }))
+}
 
 function QuizView() {
   const [examId, setExamId] = useState<string | null>(null)
+  const [attempt, setAttempt] = useState<ExamQuestionAttempt[]>([])
   const [index, setIndex] = useState(0)
-  const [selected, setSelected] = useState<number | null>(null)
-  const [submitted, setSubmitted] = useState(false)
-  const [score, setScore] = useState(0)
+  const [answers, setAnswers] = useState<Record<string, string>>({})
   const [finished, setFinished] = useState(false)
+  const [confirmSubmit, setConfirmSubmit] = useState(false)
   const exam = practiceExams.find((item) => item.id === examId) ?? null
-  const questions = exam?.questions ?? []
-  const question = questions[index]
-  const correct = question ? selected === question.answer : false
+  const current = attempt[index]
+  const question = current?.question
+  const answeredCount = Object.keys(answers).length
+  const score = attempt.reduce(
+    (total, item) => total + Number(answers[item.question.id] === item.question.correctAnswer),
+    0,
+  )
+  const unansweredCount = attempt.length - answeredCount
+  const percentage = attempt.length ? Math.round((score / attempt.length) * 100) : 0
 
   function startExam(id: string) {
     setExamId(id)
+    setAttempt(createExamAttempt())
     setIndex(0)
-    setSelected(null)
-    setSubmitted(false)
-    setScore(0)
+    setAnswers({})
     setFinished(false)
+    setConfirmSubmit(false)
   }
 
-  function submit() {
-    if (selected === null || !question) return
-    setSubmitted(true)
-    if (selected === question.answer) setScore((value) => value + 1)
+  function selectAnswer(answer: string) {
+    if (!question) return
+    setAnswers((currentAnswers) => ({ ...currentAnswers, [question.id]: answer }))
   }
 
-  function next() {
-    if (!exam) return
-    if (index === questions.length - 1) {
-      setFinished(true)
-      return
-    }
-    setIndex((value) => value + 1)
-    setSelected(null)
-    setSubmitted(false)
+  function submitExam() {
+    setConfirmSubmit(false)
+    setFinished(true)
   }
 
   if (!exam) {
@@ -1464,14 +1499,14 @@ function QuizView() {
         <div className="view-intro">
           <div className="eyebrow">Exam practice</div>
           <div className="view-title">Build confidence, one practice exam at a time.</div>
-          <p>Choose one of three original 10-question practice exams. Each answer includes an explanation. These are practice questions, not official Microsoft exam items.</p>
+          <p>Each attempt contains 40 original questions across all three AZ-900 knowledge areas. Question and answer order are randomized. Answers and explanations appear in your results review.</p>
         </div>
         <div className="module-card-grid exam-choice-grid">
           {practiceExams.map((item, examIndex) => (
             <article className="module-card" key={item.id}>
               <div className="module-card-number">0{examIndex + 1}</div>
               <div className="module-card-icon"><Icon name="quiz" size={24} /></div>
-              <div className="module-card-meta">10 questions · Mixed difficulty</div>
+              <div className="module-card-meta">{az900ExamQuestions.length} questions · Mixed difficulty</div>
               <div className="module-card-title">{item.title}</div>
               <p>{item.subtitle}</p>
               <button className="primary-button" onClick={() => startExam(item.id)}>Start practice exam <Icon name="arrow" size={17} /></button>
@@ -1483,19 +1518,64 @@ function QuizView() {
   }
 
   if (finished) {
-    const passed = score >= Math.ceil(questions.length * 0.7)
+    const recommendations = examCategories
+      .filter((category) => {
+        const categoryQuestions = attempt.filter((item) => item.question.category === category)
+        const categoryCorrect = categoryQuestions.filter(
+          (item) => answers[item.question.id] === item.question.correctAnswer,
+        ).length
+        return categoryQuestions.length > 0 && categoryCorrect / categoryQuestions.length < 0.7
+      })
+      .flatMap((category) => categoryModules[category])
+
     return (
       <section className="quiz-view">
-        <div className={`assessment-result ${passed ? "result-pass" : ""}`}>
-          <div className="result-icon"><Icon name={passed ? "check" : "book"} size={27} /></div>
+        <div className={`assessment-result exam-result ${percentage >= 70 ? "result-pass" : ""}`}>
+          <div className="result-icon"><Icon name={percentage >= 70 ? "check" : "book"} size={27} /></div>
           <div className="eyebrow">{exam.title} complete</div>
-          <div className="result-title">{score} out of {questions.length}</div>
-          <p>{passed ? "Good work! Review any missed questions, then try another exam to strengthen your readiness." : "Keep practising. Review the explanations for missed questions and try again when ready."}</p>
+          <div className="result-title">{score} out of {attempt.length}</div>
+          <p>{percentage}% correct · Unanswered questions count as incorrect.</p>
+          <div className="result-category-grid">
+            {examCategories.map((category) => {
+              const categoryQuestions = attempt.filter((item) => item.question.category === category)
+              const categoryCorrect = categoryQuestions.filter(
+                (item) => answers[item.question.id] === item.question.correctAnswer,
+              ).length
+              return (
+                <div className="result-category" key={category}>
+                  <strong>{categoryCorrect} / {categoryQuestions.length}</strong>
+                  <span>{category}</span>
+                </div>
+              )
+            })}
+          </div>
+          <p className="exam-recommendations">
+            {recommendations.length
+              ? `Review these CloudBridge modules: ${[...new Set(recommendations)].join(", ")}.`
+              : "Your results are balanced across all three areas. Keep reviewing the explanations below."}
+          </p>
           <div className="result-actions">
             <button className="secondary-control" onClick={() => startExam(exam.id)}>Retake this exam</button>
-            <button className="primary-button" onClick={() => setExamId(null)}>Choose another exam</button>
+            <button className="primary-button" onClick={() => { setExamId(null); setAttempt([]); setAnswers({}); setConfirmSubmit(false) }}>Choose another exam</button>
           </div>
         </div>
+        <section aria-label="Exam answer review" className="exam-review">
+          <div className="view-title">Answer review</div>
+          {attempt.map(({ question: item }, questionIndex) => (
+            <details className="exam-review-item" key={item.id}>
+              <summary>
+                <span>Question {questionIndex + 1}: {item.question}</span>
+                <b>{answers[item.id] === item.correctAnswer ? "Correct" : answers[item.id] ? "Incorrect" : "Unanswered"}</b>
+              </summary>
+              <div className="exam-review-content">
+                <p><strong>Your answer:</strong> {answers[item.id] ?? "Not answered"}</p>
+                <p><strong>Correct answer:</strong> {item.correctAnswer}</p>
+                <p>{item.explanation}</p>
+                <small>{item.category} · {item.objective} · {item.difficulty}</small>
+              </div>
+            </details>
+          ))}
+        </section>
       </section>
     )
   }
@@ -1504,36 +1584,63 @@ function QuizView() {
     <section className="quiz-view">
       <div className="view-intro">
         <div className="eyebrow">{exam.title}</div>
-        <div className="view-title">{exam.subtitle}</div>
-        <p>Answer each question, read the feedback, and finish the 10-question set to see your result.</p>
+        <div className="view-title">40-question AZ-900 practice exam</div>
+        <p>Choose one answer for each question. You can move between questions without losing answers. Correct answers are shown after final submission.</p>
       </div>
-      {question && <div className="quiz-layout">
-        <div className="quiz-card">
-          <div className="quiz-meta"><span>{question.module}</span><b>Question {index + 1} / {questions.length}</b></div>
-          <div className="assessment-progress"><i style={{ width: `${((index + 1) / questions.length) * 100}%` }} /></div>
+      {question && current && <div className="quiz-layout exam-layout">
+        <div className="quiz-card exam-question-card">
+          <div className="quiz-meta"><span>{question.category}</span><b>Question {index + 1} of {attempt.length}</b></div>
+          <div className="assessment-progress"><i style={{ width: `${((index + 1) / attempt.length) * 100}%` }} /></div>
+          <p className="exam-objective">{question.objective} · {question.difficulty}</p>
           <div className="quiz-question">{question.question}</div>
           <div className="quiz-options">
-            {question.options.map((option, optionIndex) => (
-              <button className={[selected === optionIndex ? "option-selected" : "", submitted && optionIndex === question.answer ? "option-correct" : "", submitted && selected === optionIndex && !correct ? "option-wrong" : ""].join(" ")} disabled={submitted} key={option} onClick={() => setSelected(optionIndex)}>
+            {current.options.map((option, optionIndex) => (
+              <button
+                aria-pressed={answers[question.id] === option}
+                className={answers[question.id] === option ? "option-selected" : ""}
+                key={option}
+                onClick={() => selectAnswer(option)}
+              >
                 <span>{String.fromCharCode(65 + optionIndex)}</span>{option}
               </button>
             ))}
           </div>
-          {submitted ? (
-            <div className={`quiz-feedback ${correct ? "feedback-correct" : ""}`}>
-              <Icon name={correct ? "check" : "book"} size={19} />
-              <div><strong>{correct ? "Correct." : "Review this one."}</strong><p>{question.explanation}</p></div>
-              <button onClick={next}>{index === questions.length - 1 ? "View result" : "Next question"} <Icon name="arrow" size={16} /></button>
+          <div className="exam-navigation-controls">
+            <button className="secondary-control" disabled={index === 0} onClick={() => setIndex((value) => value - 1)}>Previous</button>
+            {index < attempt.length - 1 && <button className="secondary-control" onClick={() => setIndex((value) => value + 1)}>Next</button>}
+            <button className="primary-button exam-submit-button" onClick={() => setConfirmSubmit(true)}>Submit exam</button>
+          </div>
+          {confirmSubmit && (
+            <div aria-labelledby="exam-submit-title" className="exam-submit-confirmation" role="group">
+              <strong id="exam-submit-title">Submit this exam?</strong>
+              <p>{unansweredCount ? `${unansweredCount} unanswered question${unansweredCount === 1 ? "" : "s"} will count as incorrect.` : "You have answered all 40 questions."} You can still cancel and review your answers.</p>
+              <div>
+                <button className="secondary-control" onClick={() => setConfirmSubmit(false)}>Keep reviewing</button>
+                <button className="primary-button" onClick={submitExam}>Submit final answers</button>
+              </div>
             </div>
-          ) : <button className="primary-button" disabled={selected === null} onClick={submit}>Check answer</button>}
+          )}
+          <nav aria-label="Exam question navigation" className="exam-question-jump">
+            {attempt.map((item, questionIndex) => (
+              <button
+                aria-current={questionIndex === index ? "step" : undefined}
+                aria-label={`Question ${questionIndex + 1}${answers[item.question.id] ? ", answered" : ", unanswered"}`}
+                className={`${questionIndex === index ? "question-current" : ""} ${answers[item.question.id] ? "question-answered" : ""}`}
+                key={item.question.id}
+                onClick={() => setIndex(questionIndex)}
+              >
+                {questionIndex + 1}
+              </button>
+            ))}
+          </nav>
         </div>
-        <aside className="quiz-score">
-          <div className="score-ring"><strong>{score}</strong><span>correct so far</span></div>
+        <aside className="quiz-score exam-score">
+          <div className="score-ring"><strong>{answeredCount}</strong><span>answered</span></div>
           <div className="eyebrow">Exam progress</div>
-          <p>Take your time. Understand why an answer is right before moving on.</p>
-          <div className="mini-stat"><span>Answered</span><strong>{index + (submitted ? 1 : 0)}</strong></div>
-          <div className="mini-stat"><span>Remaining</span><strong>{questions.length - index - (submitted ? 1 : 0)}</strong></div>
-          <button className="text-button" onClick={() => setExamId(null)}>Exit to exam list</button>
+          <p>Question {index + 1} of {attempt.length}. Your answers are kept as you navigate.</p>
+          <div className="mini-stat"><span>Answered</span><strong>{answeredCount}</strong></div>
+          <div className="mini-stat"><span>Remaining</span><strong>{attempt.length - answeredCount}</strong></div>
+          <button className="text-button" onClick={() => { setExamId(null); setAttempt([]); setAnswers({}); setConfirmSubmit(false) }}>Exit to exam list</button>
         </aside>
       </div>}
     </section>
@@ -1846,26 +1953,146 @@ function CaseStudiesView() {
 
 }
 
-function StudyPlanView() {
-  const readPlanValue = (key: string, fallback: string) => {
-    try { return window.localStorage.getItem(key) || fallback } catch { return fallback }
+type StudyPlanValues = {
+  examDate: string
+  weeklyDays: string
+  minutes: string
+  focusModule: string
+  goal: string
+}
+
+const studyPlanStorageKey = "cloudbridge-study-plan-v1"
+const studyPlanDefaults: StudyPlanValues = {
+  examDate: "",
+  weeklyDays: "4",
+  minutes: "30",
+  focusModule: modules[0].id,
+  goal: "Build confidence across all AZ-900 objectives",
+}
+const validStudyDays = ["2", "3", "4", "5", "6", "7"]
+const validStudyMinutes = ["15", "20", "30", "45", "60", "90"]
+
+function isStudyPlanValues(value: unknown): value is StudyPlanValues {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false
+  const plan = value as Record<string, unknown>
+  return (
+    typeof plan.examDate === "string" &&
+    typeof plan.weeklyDays === "string" &&
+    validStudyDays.includes(plan.weeklyDays) &&
+    typeof plan.minutes === "string" &&
+    validStudyMinutes.includes(plan.minutes) &&
+    typeof plan.focusModule === "string" &&
+    modules.some((module) => module.id === plan.focusModule) &&
+    typeof plan.goal === "string" &&
+    plan.goal.length <= 120
+  )
+}
+
+function readStudyPlan(): { values: StudyPlanValues; error: string | null } {
+  try {
+    const storedPlan = window.localStorage.getItem(studyPlanStorageKey)
+    if (storedPlan) {
+      const parsed: unknown = JSON.parse(storedPlan)
+      if (!isStudyPlanValues(parsed)) throw new Error("Invalid saved study plan")
+      return { values: parsed, error: null }
+    }
+
+    return {
+      values: {
+        examDate: window.localStorage.getItem("cloudbridge-plan-date") ?? studyPlanDefaults.examDate,
+        weeklyDays: window.localStorage.getItem("cloudbridge-plan-days") ?? studyPlanDefaults.weeklyDays,
+        minutes: window.localStorage.getItem("cloudbridge-plan-minutes") ?? studyPlanDefaults.minutes,
+        focusModule: window.localStorage.getItem("cloudbridge-plan-focus") ?? studyPlanDefaults.focusModule,
+        goal: window.localStorage.getItem("cloudbridge-plan-goal") ?? studyPlanDefaults.goal,
+      },
+      error: null,
+    }
+  } catch {
+    return {
+      values: studyPlanDefaults,
+      error: "Your saved study plan could not be loaded. You can still create and save a new plan.",
+    }
   }
-  const [examDate, setExamDate] = useState(() => readPlanValue("cloudbridge-plan-date", ""))
-  const [weeklyDays, setWeeklyDays] = useState(() => readPlanValue("cloudbridge-plan-days", "4"))
-  const [minutes, setMinutes] = useState(() => readPlanValue("cloudbridge-plan-minutes", "30"))
-  const [focusModule, setFocusModule] = useState(() => readPlanValue("cloudbridge-plan-focus", modules[0].id))
-  const [goal, setGoal] = useState(() => readPlanValue("cloudbridge-plan-goal", "Build confidence across all AZ-900 objectives"))
+}
+
+function StudyPlanView() {
+  const [initialPlan] = useState(readStudyPlan)
+  const [examDate, setExamDate] = useState(initialPlan.values.examDate)
+  const [weeklyDays, setWeeklyDays] = useState(initialPlan.values.weeklyDays)
+  const [minutes, setMinutes] = useState(initialPlan.values.minutes)
+  const [focusModule, setFocusModule] = useState(initialPlan.values.focusModule)
+  const [goal, setGoal] = useState(initialPlan.values.goal)
   const [saved, setSaved] = useState(false)
+  const [planError, setPlanError] = useState<string | null>(initialPlan.error)
+  const savedTimeoutRef = useRef<number | null>(null)
 
   useEffect(() => {
+    return () => {
+      if (savedTimeoutRef.current !== null) {
+        window.clearTimeout(savedTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  const today = new Date()
+  const minimumExamDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`
+
+  function handleSave(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setSaved(false)
+    setPlanError(null)
+
+    if (!goal.trim()) {
+      setPlanError("Enter a study goal before saving your plan.")
+      return
+    }
+
+    if (!validStudyDays.includes(weeklyDays) || !validStudyMinutes.includes(minutes)) {
+      setPlanError("Choose valid study days and session duration.")
+      return
+    }
+
+    if (!modules.some((module) => module.id === focusModule)) {
+      setPlanError("Choose a valid priority topic.")
+      return
+    }
+
+    if (examDate) {
+      const [year, month, day] = examDate.split("-").map(Number)
+      const selectedDate = new Date(year, month - 1, day)
+      const todayAtMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+      if (
+        !/^\d{4}-\d{2}-\d{2}$/.test(examDate) ||
+        selectedDate.getFullYear() !== year ||
+        selectedDate.getMonth() !== month - 1 ||
+        selectedDate.getDate() !== day ||
+        selectedDate < todayAtMidnight
+      ) {
+        setPlanError("Choose a valid exam date that is today or later.")
+        return
+      }
+    }
+
+    const plan: StudyPlanValues = {
+      examDate,
+      weeklyDays,
+      minutes,
+      focusModule,
+      goal: goal.trim(),
+    }
+
     try {
-      window.localStorage.setItem("cloudbridge-plan-date", examDate)
-      window.localStorage.setItem("cloudbridge-plan-days", weeklyDays)
-      window.localStorage.setItem("cloudbridge-plan-minutes", minutes)
-      window.localStorage.setItem("cloudbridge-plan-focus", focusModule)
-      window.localStorage.setItem("cloudbridge-plan-goal", goal)
-    } catch { /* The study plan still works for this session if storage is unavailable. */ }
-  }, [examDate, weeklyDays, minutes, focusModule, goal])
+      window.localStorage.setItem(studyPlanStorageKey, JSON.stringify(plan))
+      setGoal(plan.goal)
+      setSaved(true)
+      if (savedTimeoutRef.current !== null) {
+        window.clearTimeout(savedTimeoutRef.current)
+      }
+      savedTimeoutRef.current = window.setTimeout(() => setSaved(false), 2200)
+    } catch {
+      setPlanError("Your study plan could not be saved. Check browser storage access and try again.")
+    }
+  }
 
   const focus = modules.find((module) => module.id === focusModule) || modules[0]
   const daysUntilExam = examDate ? Math.ceil((new Date(`${examDate}T23:59:59`).getTime() - Date.now()) / 86400000) : null
@@ -1878,18 +2105,19 @@ function StudyPlanView() {
       <div className="view-intro">
         <div className="eyebrow">Your personal study planner</div>
         <div className="view-title">Make a plan that fits your life.</div>
-        <p>Set your target, choose how often you can study, and CloudBridge will keep your preferences in this browser. You can change them at any time.</p>
+        <p>Set your target, choose how often you can study, and save your preferences in this browser. You can change them at any time.</p>
       </div>
       <div className="plan-layout">
-        <form className="week-card personal-plan-form" onSubmit={(event) => { event.preventDefault(); setSaved(true); window.setTimeout(() => setSaved(false), 2200) }}>
+        <form className="week-card personal-plan-form" onSubmit={handleSave}>
           <div className="week-head"><div><small>Personal settings</small><strong>Study goals</strong></div><Icon name="calendar" size={23} /></div>
-          <label className="plan-field">What are you working towards?<input value={goal} maxLength={120} onChange={(event) => setGoal(event.target.value)} placeholder="e.g. Feel ready for the AZ-900 exam" /></label>
-          <label className="plan-field">Target exam date <span className="optional-label">(optional)</span><input type="date" value={examDate} min={new Date().toISOString().slice(0, 10)} onChange={(event) => setExamDate(event.target.value)} /></label>
-          <label className="plan-field">Study days per week<select value={weeklyDays} onChange={(event) => setWeeklyDays(event.target.value)}>{["2", "3", "4", "5", "6", "7"].map((dayCount) => <option value={dayCount} key={dayCount}>{dayCount} days a week</option>)}</select></label>
-          <label className="plan-field">Time per session<select value={minutes} onChange={(event) => setMinutes(event.target.value)}>{["15", "20", "30", "45", "60", "90"].map((duration) => <option value={duration} key={duration}>{duration} minutes</option>)}</select></label>
-          <label className="plan-field">Priority topic<select value={focusModule} onChange={(event) => setFocusModule(event.target.value)}>{modules.map((module) => <option value={module.id} key={module.id}>{module.shortTitle}</option>)}</select></label>
+          <label className="plan-field">What are you working towards?<input value={goal} maxLength={120} onChange={(event) => { setGoal(event.target.value); setSaved(false) }} placeholder="e.g. Feel ready for the AZ-900 exam" required /></label>
+          <label className="plan-field">Target exam date <span className="optional-label">(optional)</span><input type="date" value={examDate} min={minimumExamDate} onChange={(event) => { setExamDate(event.target.value); setSaved(false) }} /></label>
+          <label className="plan-field">Study days per week<select value={weeklyDays} onChange={(event) => { setWeeklyDays(event.target.value); setSaved(false) }}>{validStudyDays.map((dayCount) => <option value={dayCount} key={dayCount}>{dayCount} days a week</option>)}</select></label>
+          <label className="plan-field">Time per session<select value={minutes} onChange={(event) => { setMinutes(event.target.value); setSaved(false) }}>{validStudyMinutes.map((duration) => <option value={duration} key={duration}>{duration} minutes</option>)}</select></label>
+          <label className="plan-field">Priority topic<select value={focusModule} onChange={(event) => { setFocusModule(event.target.value); setSaved(false) }}>{modules.map((module) => <option value={module.id} key={module.id}>{module.shortTitle}</option>)}</select></label>
           <button className="primary-button" type="submit">Save my study plan <Icon name="check" size={17} /></button>
           {saved && <p className="plan-saved" role="status">Your study plan has been saved in this browser.</p>}
+          {planError && <p className="plan-error" role="alert">{planError}</p>}
         </form>
         <div className="coverage-card personal-plan-preview">
           <div className="module-card-icon"><Icon name="target" /></div>
@@ -2143,7 +2371,7 @@ export default function App() {
 
               onComplete={completeModule}
               enrolledModules={enrolledModules}
-              onEnroll={enrollModule}
+              onEnroll={(index) => enrollModule(index, true)}
               onSelect={openModule}
               selectedModule={selectedModule}
 
