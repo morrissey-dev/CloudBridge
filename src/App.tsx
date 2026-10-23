@@ -292,6 +292,66 @@ function Logo() {
 
 }
 
+const welcomeCompletedKey = "cloudbridge_welcome_completed"
+
+function hasCompletedWelcome(): boolean {
+  try {
+    return window.localStorage.getItem(welcomeCompletedKey) === "true"
+  } catch {
+    return false
+  }
+}
+
+function WelcomeScreen({ onGetStarted }: { onGetStarted: () => void }) {
+  const features: { icon: IconName; title: string }[] = [
+    { icon: "quiz", title: "Practice & Assessment" },
+    { icon: "cards", title: "Flashcard Coach" },
+    { icon: "calendar", title: "Personal Study Planner" },
+    { icon: "target", title: "Readiness Tracking" },
+  ]
+
+  return (
+    <main className="welcome-landing">
+      <header className="welcome-header">
+        <Logo />
+        <span>AZ-900 certification preparation</span>
+      </header>
+      <section aria-labelledby="welcome-title" className="welcome-hero">
+        <div className="welcome-copy">
+          <div className="eyebrow">Your Azure learning space</div>
+          <h1 id="welcome-title">Welcome, future cloud engineer!</h1>
+          <p>Your cloud journey starts here.</p>
+          <button
+            className="primary-button welcome-get-started"
+            onClick={onGetStarted}
+            type="button"
+          >
+            Get Started <Icon name="arrow" size={18} />
+          </button>
+        </div>
+        <div aria-hidden="true" className="welcome-visual">
+          <div className="welcome-visual-orbit welcome-visual-orbit-one" />
+          <div className="welcome-visual-orbit welcome-visual-orbit-two" />
+          <div className="welcome-cloud"><Icon name="cloud" size={78} /></div>
+          <span className="welcome-visual-label">Azure Fundamentals</span>
+          <div className="welcome-visual-caption">
+            <Icon name="spark" size={17} />
+            <span>Learn with confidence</span>
+          </div>
+        </div>
+      </section>
+      <section aria-label="CloudBridge learning features" className="welcome-features">
+        {features.map((feature) => (
+          <div className="welcome-feature" key={feature.title}>
+            <span><Icon name={feature.icon} size={19} /></span>
+            <strong>{feature.title}</strong>
+          </div>
+        ))}
+      </section>
+    </main>
+  )
+}
+
 function Sidebar({
 
   view,
@@ -471,18 +531,21 @@ function HomeView({
     <section className="home-view">
       <section className="home-welcome">
         <div className="kicker">Unofficial AZ-900 learning platform</div>
-        <h1>Hello, welcome! Your cloud journey starts here.</h1>
-        <p>
-          Build your Azure cloud knowledge step by step. Choose a learning module
-          below, enrol, and start preparing for your AZ-900 certification.
-        </p>
+        <h1>Ready to build your Azure skills?</h1>
+<p>
+  Explore your learning modules, practise key concepts, and track your
+  progress toward AZ-900 readiness.
+</p>
       </section>
 
       <section className="home-enrollment">
         <div>
           <div className="eyebrow">Your next step</div>
-          <h2>Hello, future cloud engineer!</h2>
-          <p>Enrol in any module to start your cloud journey.</p>
+          <h2>Ready to continue your cloud journey?</h2>
+          <p>
+            Explore your learning modules and build your Azure knowledge one
+            step at a time.
+          </p>
         </div>
         <button className="primary-button" onClick={() => onNavigate("My Learning")}>
           View My Learning <Icon name="arrow" size={17} />
@@ -525,7 +588,10 @@ function HomeView({
         <div className="section-heading">
           <div>
             <div className="eyebrow">Complete curriculum</div>
-            <h2 className="section-title">Available learning modules</h2>
+            <h2 className="section-title">Explore Learning Modules</h2>
+            <p className="home-module-instruction">
+              Choose a module to enrol or continue learning.
+            </p>
           </div>
         </div>
         <div className="module-card-grid">
@@ -1866,6 +1932,7 @@ function readStoredIndexSet(key: string): Set<number> {
 export default function App() {
 
   const [view, setView] = useState<View>("Home")
+  const [welcomeCompleted, setWelcomeCompleted] = useState(hasCompletedWelcome)
 
   const [navOpen, setNavOpen] = useState(false)
   const [selectedModule, setSelectedModule] = useState<number | null>(null)
@@ -1881,6 +1948,7 @@ export default function App() {
   )
 
   useEffect(() => {
+    if (!welcomeCompleted) return
     try {
       window.localStorage.setItem("cloudbridge-enrolled-v1", JSON.stringify([...enrolledModules]))
       window.localStorage.setItem("cloudbridge-started-v1", JSON.stringify([...startedModules]))
@@ -1888,7 +1956,16 @@ export default function App() {
     } catch {
       // CloudBridge remains usable when browser storage is unavailable.
     }
-  }, [enrolledModules, startedModules, completedModules])
+  }, [welcomeCompleted, enrolledModules, startedModules, completedModules])
+
+  function completeWelcome() {
+    try {
+      window.localStorage.setItem(welcomeCompletedKey, "true")
+    } catch {
+      // Continue to the dashboard when browser storage is unavailable.
+    }
+    setWelcomeCompleted(true)
+  }
 
   function navigate(nextView: View) {
 
@@ -1936,6 +2013,10 @@ export default function App() {
 
     window.scrollTo({ top: 0, behavior: "smooth" })
 
+  }
+
+  if (!welcomeCompleted) {
+    return <WelcomeScreen onGetStarted={completeWelcome} />
   }
 
   return (

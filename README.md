@@ -120,6 +120,8 @@ npm run build
 
 Learning progress is stored locally in the browser where supported by the application. It is not necessarily synchronised between different devices or browsers.
 
+The first-visit welcome screen stores its completion flag separately in browser local storage; it does not replace or reset learning progress.
+
 \## Project Status
 
 CloudBridge is a learning project intended to support Azure Fundamentals preparation. It is not an official Microsoft product, and it does not replace Microsoft's official learning materials.
@@ -129,4 +131,3 @@ CloudBridge is a learning project intended to support Azure Fundamentals prepara
 \## Repository
 
 \[https://github.com/morrissey-dev/CloudBridge](https://github.com/morrissey-dev/CloudBridge)
-
