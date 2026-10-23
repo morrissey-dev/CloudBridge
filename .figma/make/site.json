@@ -1,0 +1,16 @@
+
+{
+  "title": "CloudBridge | AZ-900 Learning",
+  "description": "An unofficial Azure Fundamentals learning platform with practice quizzes, explanations, flashcards, case studies and revision planning.",
+  "language": "en",
+  "robots": {
+    "index": true
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  },
+  "icons": {
+    "icon": "/favicon.svg"
+  }
+}
