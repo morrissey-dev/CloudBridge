@@ -14,9 +14,10 @@ export type AZ900Question = {
   options: [string, string, string, string]
   correctAnswer: string
   explanation: string
+  verificationStatus?: "needs-verification"
 }
 
-export const az900ExamQuestions: AZ900Question[] = [
+const originalAZ900ExamQuestions: AZ900Question[] = [
   {
     id: "cloud-01",
     category: "Cloud concepts",
@@ -572,3 +573,9 @@ export const az900ExamQuestions: AZ900Question[] = [
       "Key Vault stores and controls access to secrets, keys, and certificates. Defender for Cloud assesses security posture and helps protect workloads with recommendations and threat alerts.",
   },
 ]
+
+export const az900ExamQuestions: AZ900Question[] = [
+  ...originalAZ900ExamQuestions,
+  ...additionalAZ900Questions,
+]
+import { additionalAZ900Questions } from "./az900AdditionalQuestions.ts"

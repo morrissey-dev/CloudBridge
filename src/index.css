@@ -721,6 +721,45 @@
   text-transform: uppercase;
 }
 
+.module-lesson-progress {
+  color: var(--muted);
+  font-size: 9px;
+  margin: 10px 0 12px;
+}
+
+.module-lesson-progress > div:first-child {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.module-lesson-progress strong {
+  color: var(--ink);
+  font-size: 10px;
+}
+
+.module-lesson-progress small {
+  display: block;
+  font-size: 8px;
+  margin-top: 4px;
+}
+
+.module-lesson-track {
+  background: #e9e2d4;
+  border-radius: 99px;
+  height: 5px;
+  margin-top: 5px;
+  overflow: hidden;
+}
+
+.module-lesson-track > span {
+  background: var(--gold);
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+  transition: width 180ms ease;
+}
+
 .featured-title {
   font-family: "Manrope", sans-serif;
   font-size: 19px;
@@ -1746,6 +1785,47 @@
   border-radius: 11px;
   margin-top: 8px;
   overflow: hidden;
+}
+
+.exam-history-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 13px 15px;
+}
+
+.exam-history-row > span {
+  display: grid;
+  gap: 4px;
+}
+
+.exam-history-row strong {
+  color: #102b46;
+  font-size: 12px;
+}
+
+.exam-history-row small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.exam-verification-note {
+  color: #86590e;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.verification-badge {
+  background: #fff2ce;
+  border-radius: 999px;
+  color: #86590e;
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  margin-left: 8px;
+  padding: 4px 8px;
 }
 
 .exam-review-item summary {
@@ -3084,6 +3164,7 @@ footer {
   }
 
   .home-progress-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
   }
 

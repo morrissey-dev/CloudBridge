@@ -21,7 +21,7 @@ CloudBridge brings learning and revision tools together in one platform, helping
 
 \- \*\*Learning Modules:\*\* Explore structured Azure Fundamentals learning content.
 
-\- \*\*Practice Quizzes:\*\* Take one of three randomized, original 40-question AZ-900 practice exams with area-level scoring and answer review.
+\- \*\*Practice Quizzes:\*\* Take one of five randomized, non-overlapping 45-question AZ-900 practice exams with area-level scoring and answer review. New questions are visibly marked for verification against official Microsoft Learn documentation.
 
 \- \*\*Flashcards:\*\* Review key terms and concepts.
 
@@ -118,9 +118,9 @@ npm run build
 
 \## Progress and Data
 
-Study plans and learning progress are stored locally in the browser where supported by the application. They are not necessarily synchronised between different devices or browsers.
+Study plans and learning progress are stored locally in the browser where supported by the application. Lesson positions, completed lessons, knowledge-check answers and results, unfinished practice exams, and completed exam history are included. Progress is not necessarily synchronised between different devices or browsers.
 
-The first-visit welcome screen stores its completion flag separately in browser local storage; it does not replace or reset learning progress.
+The first-visit welcome screen stores its completion flag separately in browser local storage; it does not replace or reset learning progress. Existing enrollment, started-module, and completed-module data remains in its original storage keys. Curriculum topic and lesson counts, module completion percentages, assessment results, exam averages, daily study dates, and consecutive-day streaks are calculated from saved progress and the curriculum. Study activity is recorded when a learner completes lesson steps, submits quiz answers, or reviews flashcards; multiple study actions on one local calendar day count as one study day.
 
 \## Project Status
 

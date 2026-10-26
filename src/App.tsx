@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react"
 
 import {
 
@@ -10,8 +10,34 @@ import {
 import {
   az900ExamQuestions,
   type AZ900Category,
-  type AZ900Question,
 } from "./az900Exam"
+import {
+  createExamAttempt,
+  createKnowledgeCheckQuestions,
+  practiceExamPools,
+  practiceExams,
+  restoreExamAttempt,
+  scoreKnowledgeCheckAnswers,
+  type ExamQuestionAttempt,
+} from "./assessment"
+import {
+  createEmptyLearningProgress,
+  createEmptyModuleProgress,
+  readLearningProgress,
+  writeLearningProgress,
+  type CompletedExamAttempt,
+  type ExamSession,
+  type LearningProgress,
+  type ModuleLearningProgress,
+} from "./learningProgress"
+import {
+  addStudyActivityDay,
+  calculateStudyStreak,
+  getLearningOverview,
+  getModuleLessonProgress,
+} from "./learningStatistics"
+import Icon, { type IconName } from "./components/Icon"
+import ModuleCard from "./components/ModuleCard"
 
 type View =
 
@@ -28,34 +54,6 @@ type View =
   | "Case studies"
 
   | "Study plan"
-
-type IconName =
-
-  | "arrow"
-
-  | "book"
-
-  | "calendar"
-
-  | "cards"
-
-  | "check"
-
-  | "chevron"
-
-  | "close"
-
-  | "cloud"
-
-  | "home"
-
-  | "menu"
-
-  | "quiz"
-
-  | "spark"
-
-  | "target"
 
 const navItems: { label: View; icon: IconName }[] = [
 
@@ -74,200 +72,6 @@ const navItems: { label: View; icon: IconName }[] = [
   { label: "Study plan", icon: "calendar" },
 
 ]
-
-type KnowledgeQuestion = {
-
-  concept: string
-
-  prompt: string
-
-  options: string[]
-
-  answer: number
-
-}
-
-function buildKnowledgeCheck(module: CourseModule): KnowledgeQuestion[] {
-
-  const concepts = module.sections.flatMap((section) => section.concepts)
-
-  return Array.from({ length: Math.min(10, concepts.length) }, (_, index) => {
-
-    const current = concepts[index % concepts.length]
-
-    const distractorPool = concepts
-
-      .filter((concept) => concept.title !== current.title)
-
-      .map((concept) => concept.definition)
-
-    const distractors = [0, 1, 2].map(
-
-      (offset) => distractorPool[(index + offset) % distractorPool.length],
-
-    )
-
-    const answer = index % 4
-
-    const options = [...distractors]
-
-    options.splice(answer, 0, current.definition)
-
-    return {
-
-      concept: current.title,
-
-      prompt: `Which explanation best describes “${current.title}”?`,
-
-      options,
-
-      answer,
-
-    }
-
-  })
-
-}
-
-function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
-
-  const paths: Record<IconName, ReactNode> = {
-
-    arrow: <path d="M5 12h14m-5-5 5 5-5 5" />,
-
-    book: (
-
-      <>
-
-        <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v16H6.5A2.5 2.5 0 0 0 4 21.5v-16Z" />
-
-        <path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H13v16h4.5a2.5 2.5 0 0 1 2.5 2.5v-16Z" />
-
-      </>
-
-    ),
-
-    calendar: (
-
-      <>
-
-        <rect x="3" y="5" width="18" height="16" rx="3" />
-
-        <path d="M16 3v4M8 3v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01" />
-
-      </>
-
-    ),
-
-    cards: (
-
-      <>
-
-        <rect x="5" y="3" width="14" height="18" rx="3" />
-
-        <path d="M9 8h6M9 12h4M3.5 7.5 2.4 17a3 3 0 0 0 2.65 3.33" />
-
-      </>
-
-    ),
-
-    check: <path d="m5 12 4 4L19 6" />,
-
-    chevron: <path d="m9 18 6-6-6-6" />,
-
-    close: <path d="m6 6 12 12M18 6 6 18" />,
-
-    cloud: (
-
-      <path d="M17.5 19H6a4 4 0 0 1-.4-7.98A6.5 6.5 0 0 1 18.1 9.6 4.7 4.7 0 0 1 17.5 19Z" />
-
-    ),
-
-    home: (
-
-      <>
-
-        <path d="m3 11 9-8 9 8" />
-
-        <path d="M5 10v10h14V10M9 20v-6h6v6" />
-
-      </>
-
-    ),
-
-    menu: <path d="M4 7h16M4 12h16M4 17h16" />,
-
-    quiz: (
-
-      <>
-
-        <rect x="4" y="3" width="16" height="18" rx="3" />
-
-        <path d="M8 8h.01M11 8h5M8 12h.01M11 12h5M8 16h.01M11 16h5" />
-
-      </>
-
-    ),
-
-    spark: (
-
-      <path d="m12 2 1.4 5.1L18 9l-4.6 1.9L12 16l-1.4-5.1L6 9l4.6-1.9L12 2ZM19 15l.7 2.3L22 18l-2.3.7L19 21l-.7-2.3L16 18l2.3-.7L19 15Z" />
-
-    ),
-
-    target: (
-
-      <>
-
-        <circle cx="12" cy="12" r="9" />
-
-        <circle cx="12" cy="12" r="5" />
-
-        <circle cx="12" cy="12" r="1" />
-
-      </>
-
-    ),
-
-  }
-
-  return (
-
-    <svg
-
-      aria-hidden="true"
-
-      fill="none"
-
-      height={size}
-
-      viewBox="0 0 24 24"
-
-      width={size}
-
-    >
-
-      <g
-
-        stroke="currentColor"
-
-        strokeLinecap="round"
-
-        strokeLinejoin="round"
-
-        strokeWidth="1.8"
-
-      >
-
-        {paths[name]}
-
-      </g>
-
-    </svg>
-
-  )
-
-}
 
 function Logo() {
 
@@ -365,7 +169,7 @@ function Sidebar({
 
   onNavigate,
 
-  completedCount,
+  learningOverview,
 
 }: {
 
@@ -377,7 +181,7 @@ function Sidebar({
 
   onNavigate: (view: View) => void
 
-  completedCount: number
+  learningOverview: ReturnType<typeof getLearningOverview>
 
 }) {
 
@@ -453,17 +257,17 @@ function Sidebar({
 
           <span>Your progress</span>
 
-          <strong>{completedCount ? "Learning in progress" : "Ready to begin"}</strong>
+          <strong>{learningOverview.completedLessons ? "Learning in progress" : "Ready to begin"}</strong>
 
           <div className="track">
 
-            <i style={{ width: `${(completedCount / modules.length) * 100}%` }} />
+            <i style={{ width: `${learningOverview.lessonCompletionPercent}%` }} />
 
           </div>
 
           <small>
 
-            {completedCount} of {modules.length} modules complete
+            {learningOverview.completedLessons} of {learningOverview.totalLessons} lessons complete
 
           </small>
 
@@ -476,59 +280,26 @@ function Sidebar({
 
 }
 
-function ModuleCard({
-  module,
-  onStart,
-  onEnroll,
-  enrolled,
-  locked,
-  completed,
-}: {
-  module: CourseModule
-  onStart: () => void
-  onEnroll: () => void
-  enrolled: boolean
-  locked: boolean
-  completed: boolean
-}) {
-  const count = module.sections.reduce((total, section) => total + section.concepts.length, 0)
-  return (
-    <article className={`module-card ${locked ? "module-card-locked" : ""} ${completed ? "module-card-completed" : ""}`}>
-      <div className="module-card-number">{module.number}</div>
-      <div className="module-card-icon"><Icon name={module.number === "01" ? "cloud" : module.number === "02" ? "target" : module.number === "03" ? "spark" : "book"} size={24} /></div>
-      <div className="module-card-meta">{module.duration} · {count} topics</div>
-      <div className={`module-status ${completed ? "status-complete" : ""}`}>{completed ? "Completed" : enrolled ? "Enrolled" : locked ? "Locked" : "Available"}</div>
-      <div className="module-card-title">{module.title}</div>
-      <p>{module.description}</p>
-      <div className="module-preview">
-        {module.sections.slice(0, 3).map((section, index) => <div key={section.title}><span>{index + 1}</span>{section.title}</div>)}
-      </div>
-      <button
-        className="primary-button"
-        disabled={locked}
-        onClick={enrolled ? onStart : onEnroll}
-      >
-        {completed ? "Review Module" : enrolled ? "Continue Learning" : "Enroll to Start Learning"}
-        <Icon name="arrow" size={17} />
-      </button>
-    </article>
-  )
-}
-
 function HomeView({
   onNavigate,
   onOpenModule,
   onEnroll,
   enrolledModules,
   completedModules,
+  learningOverview,
+  learningProgress,
+  legacyCompletedModuleIds,
 }: {
   onNavigate: (view: View) => void
   onOpenModule: (index: number) => void
   onEnroll: (index: number) => void
   enrolledModules: Set<number>
   completedModules: Set<number>
+  learningOverview: ReturnType<typeof getLearningOverview>
+  learningProgress: LearningProgress
+  legacyCompletedModuleIds: ReadonlySet<string>
 }) {
-  const progress = Math.round((completedModules.size / modules.length) * 100)
+  const progress = learningOverview.lessonCompletionPercent
 
   return (
     <section className="home-view">
@@ -566,7 +337,11 @@ function HomeView({
         <div className="home-progress-stats">
           <div><strong>{enrolledModules.size}</strong><span>Modules enrolled</span></div>
           <div><strong>{completedModules.size}</strong><span>Modules completed</span></div>
-          <div><strong>{progress}%</strong><span>Overall progress</span></div>
+          <div><strong>{learningOverview.completedLessons}/{learningOverview.totalLessons}</strong><span>Lessons completed</span></div>
+          <div><strong>{learningOverview.totalTopics}</strong><span>Curriculum topics</span></div>
+          <div><strong>{learningOverview.completedKnowledgeChecks}</strong><span>Knowledge checks completed</span></div>
+          <div><strong>{learningOverview.completedPracticeExams}</strong><span>Practice exams completed</span></div>
+          <div><strong>{learningOverview.averagePracticeExamPercent === null ? "—" : `${learningOverview.averagePracticeExamPercent}%`}</strong><span>Practice exam average</span></div>
         </div>
         <div
           aria-label={`Overall learning progress: ${progress}%`}
@@ -582,7 +357,7 @@ function HomeView({
           {enrolledModules.size === 0
             ? "Every cloud expert starts somewhere. Choose a module below to begin."
             : progress === 100
-              ? "You’ve completed every learning module. Great work!"
+            ? "You’ve completed every lesson. Great work!"
               : "Keep going — your learning progress is saved in this browser."}
         </p>
       </section>
@@ -605,6 +380,11 @@ function HomeView({
               key={module.id}
               locked={false}
               module={module}
+              lessonProgress={getModuleLessonProgress(
+                module,
+                learningProgress.modules[module.id],
+                legacyCompletedModuleIds.has(module.id),
+              )}
               onEnroll={() => onEnroll(index)}
               onStart={() => onOpenModule(index)}
             />
@@ -626,9 +406,9 @@ function HomeView({
 
             <small>Knowledge checks</small>
 
-            <strong>3 full exams · {az900ExamQuestions.length} questions each</strong>
+            <strong>5 full exams · 45 questions each</strong>
 
-            <p>Forty randomized AZ-900 questions with a complete results review.</p>
+            <p>Five fixed, non-overlapping question pools with randomized order and complete answer review.</p>
 
           </div>
 
@@ -764,6 +544,12 @@ function ModuleDetail({
 
   completed,
 
+  savedProgress,
+
+  onProgressChange,
+
+  onStudyActivity,
+
 }: {
 
   module: CourseModule
@@ -773,6 +559,12 @@ function ModuleDetail({
   onComplete: () => void
 
   completed: boolean
+
+  savedProgress: ModuleLearningProgress
+
+  onProgressChange: (moduleId: string, progress: ModuleLearningProgress) => void
+
+  onStudyActivity: () => void
 
 }) {
 
@@ -796,37 +588,92 @@ function ModuleDetail({
 
   )
 
-  const assessment = useMemo(() => buildKnowledgeCheck(module), [module])
+  const assessment = useMemo(
+    () => createKnowledgeCheckQuestions(module),
+    [module],
+  )
 
-  const [phase, setPhase] = useState<"lessons" | "assessment">("lessons")
+  const [phase, setPhase] = useState<"lessons" | "assessment">(savedProgress.phase)
 
-  const [lessonIndex, setLessonIndex] = useState(0)
+  const [lessonIndex, setLessonIndex] = useState(savedProgress.currentLessonIndex)
 
-  const [questionIndex, setQuestionIndex] = useState(0)
+  const [questionIndex, setQuestionIndex] = useState(savedProgress.questionIndex)
 
-  const [selected, setSelected] = useState<number | null>(null)
+  const [selected, setSelected] = useState<number | null>(savedProgress.selectedAnswerIndex)
 
-  const [submitted, setSubmitted] = useState(false)
+  const [submitted, setSubmitted] = useState(savedProgress.submitted)
 
-  const [score, setScore] = useState(0)
+  const [answers, setAnswers] = useState<Record<string, number>>(savedProgress.answers)
 
-  const [finished, setFinished] = useState(false)
+  const [finished, setFinished] = useState(savedProgress.finished)
+
+  const [completedLessonIndexes, setCompletedLessonIndexes] = useState(
+    savedProgress.completedLessonIndexes,
+  )
+
+  const [assessmentAttempts, setAssessmentAttempts] = useState(
+    savedProgress.assessmentAttempts,
+  )
 
   const lesson = lessons[lessonIndex]
 
   const question = assessment[questionIndex]
 
+  const lessonProgress = ((lessonIndex + 1) / lessons.length) * 100
+  const score = scoreKnowledgeCheckAnswers(
+    answers,
+    assessment.map((item) => item.answer),
+  )
   const passed = finished && score >= 8
 
-  const lessonProgress = ((lessonIndex + 1) / lessons.length) * 100
+  function markCurrentLessonCompleted() {
+    onStudyActivity()
+    setCompletedLessonIndexes((current) =>
+      current.includes(lessonIndex)
+        ? current
+        : [...current, lessonIndex].sort((left, right) => left - right),
+    )
+  }
+
+  useEffect(() => {
+    const progress: ModuleLearningProgress = {
+      currentLessonIndex: lessonIndex,
+      completedLessonIndexes,
+      phase,
+      questionIndex,
+      selectedAnswerIndex: selected,
+      submitted,
+      answers,
+      score,
+      finished,
+      assessmentAttempts,
+    }
+    if (JSON.stringify(progress) !== JSON.stringify(savedProgress)) {
+      onProgressChange(module.id, progress)
+    }
+  }, [
+    answers,
+    assessmentAttempts,
+    completedLessonIndexes,
+    finished,
+    lessonIndex,
+    module.id,
+    onProgressChange,
+    phase,
+    questionIndex,
+    savedProgress,
+    score,
+    selected,
+    submitted,
+  ])
 
   function submitAnswer() {
 
     if (selected === null) return
 
+    onStudyActivity()
     setSubmitted(true)
-
-    if (selected === question.answer) setScore((value) => value + 1)
+    setAnswers((current) => ({ ...current, [questionIndex]: selected }))
 
   }
 
@@ -835,6 +682,14 @@ function ModuleDetail({
     if (questionIndex === assessment.length - 1) {
 
       setFinished(true)
+      setAssessmentAttempts((current) => [
+        ...current,
+        {
+          score,
+          passed: score >= 8,
+          completedAt: new Date().toISOString(),
+        },
+      ])
 
       return
 
@@ -856,7 +711,7 @@ function ModuleDetail({
 
     setSubmitted(false)
 
-    setScore(0)
+    setAnswers({})
 
     setFinished(false)
 
@@ -886,7 +741,7 @@ function ModuleDetail({
 
         <div className="module-facts">
 
-          <span>{module.duration}</span>
+          <span>{module.sections.length} topics · {lessons.length} lessons</span>
 
           <strong>{completed ? "Completed" : "In progress"}</strong>
 
@@ -1004,7 +859,10 @@ function ModuleDetail({
 
                 className="primary-button"
 
-                onClick={() => setLessonIndex((value) => value + 1)}
+                onClick={() => {
+                  markCurrentLessonCompleted()
+                  setLessonIndex((value) => value + 1)
+                }}
 
               >
 
@@ -1019,6 +877,8 @@ function ModuleDetail({
                 className="primary-button"
 
                 onClick={() => {
+
+                  markCurrentLessonCompleted()
 
                   setPhase("assessment")
 
@@ -1308,6 +1168,10 @@ function ModulesView({
   enrolledModules,
   onEnroll,
   onComplete,
+  learningProgress,
+  onProgressChange,
+  onStudyActivity,
+  legacyCompletedModuleIds,
 }: {
   selectedModule: number | null
   onSelect: (index: number) => void
@@ -1316,9 +1180,24 @@ function ModulesView({
   enrolledModules: Set<number>
   onEnroll: (index: number) => void
   onComplete: (index: number) => void
+  learningProgress: LearningProgress
+  onProgressChange: (moduleId: string, progress: ModuleLearningProgress) => void
+  onStudyActivity: () => void
+  legacyCompletedModuleIds: ReadonlySet<string>
 }) {
   if (selectedModule !== null) {
-    return <ModuleDetail completed={completedModules.has(selectedModule)} module={modules[selectedModule]} onBack={onBack} onComplete={() => onComplete(selectedModule)} />
+    const module = modules[selectedModule]
+    return (
+      <ModuleDetail
+        completed={completedModules.has(selectedModule)}
+        module={module}
+        onBack={onBack}
+        onComplete={() => onComplete(selectedModule)}
+        onProgressChange={onProgressChange}
+        onStudyActivity={onStudyActivity}
+        savedProgress={learningProgress.modules[module.id] ?? createEmptyModuleProgress()}
+      />
+    )
   }
   return (
     <section className="modules-view">
@@ -1335,6 +1214,11 @@ function ModulesView({
             key={module.id}
             locked={false}
             module={module}
+            lessonProgress={getModuleLessonProgress(
+              module,
+              learningProgress.modules[module.id],
+              legacyCompletedModuleIds.has(module.id),
+            )}
             onEnroll={() => onEnroll(index)}
             onStart={() => onSelect(index)}
           />
@@ -1348,12 +1232,16 @@ function MyLearningView({
   enrolledModules,
   startedModules,
   completedModules,
+  learningProgress,
+  legacyCompletedModuleIds,
   onOpenModule,
   onBrowseModules,
 }: {
   enrolledModules: Set<number>
   startedModules: Set<number>
   completedModules: Set<number>
+  learningProgress: LearningProgress
+  legacyCompletedModuleIds: ReadonlySet<string>
   onOpenModule: (index: number) => void
   onBrowseModules: () => void
 }) {
@@ -1389,14 +1277,28 @@ function MyLearningView({
               const completed = completedModules.has(index)
               const started = startedModules.has(index)
               const status = completed ? "Completed" : started ? "In progress" : "Not started"
-              const topicCount = module.sections.reduce((total, section) => total + section.concepts.length, 0)
+              const lessonProgress = getModuleLessonProgress(
+                module,
+                learningProgress.modules[module.id],
+                legacyCompletedModuleIds.has(module.id),
+              )
               return (
                 <article className={`module-card ${completed ? "module-card-completed" : ""}`} key={module.id}>
                   <div className="module-card-number">{module.number}</div>
                   <div className="module-card-icon">
                     <Icon name={module.number === "01" ? "cloud" : module.number === "02" ? "target" : module.number === "03" ? "spark" : "book"} size={24} />
                   </div>
-                  <div className="module-card-meta">{module.duration} · {topicCount} topics</div>
+                  <div className="module-card-meta">{module.sections.length} topics · {lessonProgress.totalLessons} lessons</div>
+                  <div className="module-lesson-progress">
+                    <div>
+                      <span>Lessons completed</span>
+                      <strong>{lessonProgress.percent}%</strong>
+                    </div>
+                    <div aria-label={`${lessonProgress.percent}% of lessons completed`} aria-valuemax={100} aria-valuemin={0} aria-valuenow={lessonProgress.percent} className="module-lesson-track" role="progressbar">
+                      <span style={{ width: `${lessonProgress.percent}%` }} />
+                    </div>
+                    <small>{lessonProgress.completedLessons} of {lessonProgress.totalLessons} lessons</small>
+                  </div>
                   <div className={`module-status ${completed ? "status-complete" : ""}`}>{status}</div>
                   <div className="module-card-title">{module.title}</div>
                   <p>{module.description}</p>
@@ -1417,17 +1319,6 @@ function MyLearningView({
   )
 }
 
-const practiceExams = [
-  { id: "exam-1", title: "Practice Exam 1", subtitle: "Full AZ-900 assessment · randomized questions" },
-  { id: "exam-2", title: "Practice Exam 2", subtitle: "Full AZ-900 assessment · randomized questions" },
-  { id: "exam-3", title: "Practice Exam 3", subtitle: "Full AZ-900 assessment · randomized questions" },
-]
-
-type ExamQuestionAttempt = {
-  question: AZ900Question
-  options: string[]
-}
-
 const examCategories: AZ900Category[] = [
   "Cloud concepts",
   "Azure architecture and services",
@@ -1440,27 +1331,30 @@ const categoryModules: Record<AZ900Category, string[]> = {
   "Azure management and governance": ["Governance & security"],
 }
 
-function shuffled<T>(items: readonly T[]): T[] {
-  const result = [...items]
-  for (let index = result.length - 1; index > 0; index -= 1) {
-    const swapIndex = Math.floor(Math.random() * (index + 1))
-    ;[result[index], result[swapIndex]] = [result[swapIndex], result[index]]
-  }
-  return result
-}
-
-function createExamAttempt(): ExamQuestionAttempt[] {
-  return shuffled(az900ExamQuestions).map((question) => ({
-    question,
-    options: shuffled(question.options),
-  }))
-}
-
-function QuizView() {
-  const [examId, setExamId] = useState<string | null>(null)
-  const [attempt, setAttempt] = useState<ExamQuestionAttempt[]>([])
-  const [index, setIndex] = useState(0)
-  const [answers, setAnswers] = useState<Record<string, string>>({})
+function QuizView({
+  savedSessions,
+  examHistory,
+  onSessionChange,
+  onExamCompleted,
+  onStudyActivity,
+}: {
+  savedSessions: Record<string, ExamSession>
+  examHistory: CompletedExamAttempt[]
+  onSessionChange: (examId: string, session: ExamSession | null) => void
+  onExamCompleted: (attempt: CompletedExamAttempt) => void
+  onStudyActivity: () => void
+}) {
+  const initialExamId = Object.keys(savedSessions)[0] ?? null
+  const initialSession = initialExamId ? savedSessions[initialExamId] : null
+  const [examId, setExamId] = useState<string | null>(initialExamId)
+  const [attemptId, setAttemptId] = useState(initialSession?.attemptId ?? "")
+  const [attempt, setAttempt] = useState<ExamQuestionAttempt[]>(() =>
+    initialSession ? restoreExamAttempt(initialSession) : [],
+  )
+  const [index, setIndex] = useState(initialSession?.index ?? 0)
+  const [answers, setAnswers] = useState<Record<string, string>>(
+    initialSession?.answers ?? {},
+  )
   const [finished, setFinished] = useState(false)
   const [confirmSubmit, setConfirmSubmit] = useState(false)
   const exam = practiceExams.find((item) => item.id === examId) ?? null
@@ -1475,44 +1369,120 @@ function QuizView() {
   const percentage = attempt.length ? Math.round((score / attempt.length) * 100) : 0
 
   function startExam(id: string) {
+    const session = savedSessions[id] ?? createExamAttempt(id)
     setExamId(id)
-    setAttempt(createExamAttempt())
-    setIndex(0)
-    setAnswers({})
+    setAttemptId(session.attemptId)
+    setAttempt(restoreExamAttempt(session))
+    setIndex(session.index)
+    setAnswers(session.answers)
     setFinished(false)
     setConfirmSubmit(false)
   }
 
   function selectAnswer(answer: string) {
     if (!question) return
+    onStudyActivity()
     setAnswers((currentAnswers) => ({ ...currentAnswers, [question.id]: answer }))
   }
 
   function submitExam() {
+    if (!examId) return
     setConfirmSubmit(false)
+    const completedAttempt: CompletedExamAttempt = {
+      attemptId,
+      examId,
+      questionIds: attempt.map(({ question: item }) => item.id),
+      optionsByQuestion: Object.fromEntries(
+        attempt.map(({ question: item, options }) => [item.id, options]),
+      ),
+      answers,
+      index,
+      score,
+      completedAt: new Date().toISOString(),
+    }
+    onSessionChange(examId, null)
+    onExamCompleted(completedAttempt)
     setFinished(true)
   }
 
-  if (!exam) {
+  useEffect(() => {
+    if (!examId || finished || !attempt.length) return
+    const session: ExamSession = {
+      attemptId,
+      examId,
+      questionIds: attempt.map(({ question: item }) => item.id),
+      optionsByQuestion: Object.fromEntries(
+        attempt.map(({ question: item, options }) => [item.id, options]),
+      ),
+      answers,
+      index,
+    }
+    if (JSON.stringify(session) !== JSON.stringify(savedSessions[examId])) {
+      onSessionChange(examId, session)
+    }
+  }, [
+    answers,
+    attempt,
+    attemptId,
+    examId,
+    finished,
+    index,
+    onSessionChange,
+    savedSessions,
+  ])
+
+  if (!exam || !examId || !attempt.length) {
     return (
       <section className="quiz-view">
         <div className="view-intro">
           <div className="eyebrow">Exam practice</div>
           <div className="view-title">Build confidence, one practice exam at a time.</div>
-          <p>Each attempt contains 40 original questions across all three AZ-900 knowledge areas. Question and answer order are randomized. Answers and explanations appear in your results review.</p>
+          <p>Each attempt contains 45 questions from its own fixed pool across the three AZ-900 knowledge areas. Question and answer order are randomized. Answers and explanations appear in your results review.</p>
+          <p className="exam-verification-note">Questions marked “Needs Microsoft Learn verification” are new original study questions pending documentation review.</p>
         </div>
         <div className="module-card-grid exam-choice-grid">
           {practiceExams.map((item, examIndex) => (
             <article className="module-card" key={item.id}>
               <div className="module-card-number">0{examIndex + 1}</div>
               <div className="module-card-icon"><Icon name="quiz" size={24} /></div>
-              <div className="module-card-meta">{az900ExamQuestions.length} questions · Mixed difficulty</div>
+              <div className="module-card-meta">{practiceExamPools[examIndex].length} questions · Mixed difficulty</div>
               <div className="module-card-title">{item.title}</div>
               <p>{item.subtitle}</p>
-              <button className="primary-button" onClick={() => startExam(item.id)}>Start practice exam <Icon name="arrow" size={17} /></button>
+              <button className="primary-button" onClick={() => startExam(item.id)}>
+                {savedSessions[item.id] ? "Resume practice exam" : "Start practice exam"}
+                <Icon name="arrow" size={17} />
+              </button>
             </article>
           ))}
         </div>
+        {examHistory.length > 0 && (
+          <section aria-label="Completed practice exam history" className="exam-review">
+            <div className="view-title">Completed practice exams</div>
+            {examHistory.map((item) => {
+              const completedExam = practiceExams.find((examItem) => examItem.id === item.examId)
+              return (
+                <div className="exam-review-item" key={item.attemptId}>
+                  <div className="exam-history-row">
+                    <span>
+                      <strong>{completedExam?.title ?? "Practice exam"}</strong>
+                      <small>{new Date(item.completedAt).toLocaleString()} · {item.score} / {item.questionIds.length}</small>
+                    </span>
+                    <button className="secondary-control" onClick={() => {
+                      setExamId(item.examId)
+                      setAttemptId(item.attemptId)
+                      setAttempt(restoreExamAttempt(item))
+                      setIndex(item.index)
+                      setAnswers(item.answers)
+                      setFinished(true)
+                    }}>
+                      Review results
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
+          </section>
+        )}
       </section>
     )
   }
@@ -1556,7 +1526,7 @@ function QuizView() {
           </p>
           <div className="result-actions">
             <button className="secondary-control" onClick={() => startExam(exam.id)}>Retake this exam</button>
-            <button className="primary-button" onClick={() => { setExamId(null); setAttempt([]); setAnswers({}); setConfirmSubmit(false) }}>Choose another exam</button>
+            <button className="primary-button" onClick={() => { setExamId(null); setConfirmSubmit(false) }}>Choose another exam</button>
           </div>
         </div>
         <section aria-label="Exam answer review" className="exam-review">
@@ -1572,6 +1542,11 @@ function QuizView() {
                 <p><strong>Correct answer:</strong> {item.correctAnswer}</p>
                 <p>{item.explanation}</p>
                 <small>{item.category} · {item.objective} · {item.difficulty}</small>
+                {item.verificationStatus === "needs-verification" && (
+                  <p className="exam-verification-note">
+                    Needs verification against official Microsoft Learn documentation.
+                  </p>
+                )}
               </div>
             </details>
           ))}
@@ -1584,14 +1559,19 @@ function QuizView() {
     <section className="quiz-view">
       <div className="view-intro">
         <div className="eyebrow">{exam.title}</div>
-        <div className="view-title">40-question AZ-900 practice exam</div>
+        <div className="view-title">45-question AZ-900 practice exam</div>
         <p>Choose one answer for each question. You can move between questions without losing answers. Correct answers are shown after final submission.</p>
       </div>
       {question && current && <div className="quiz-layout exam-layout">
         <div className="quiz-card exam-question-card">
           <div className="quiz-meta"><span>{question.category}</span><b>Question {index + 1} of {attempt.length}</b></div>
           <div className="assessment-progress"><i style={{ width: `${((index + 1) / attempt.length) * 100}%` }} /></div>
-          <p className="exam-objective">{question.objective} · {question.difficulty}</p>
+          <p className="exam-objective">
+            {question.objective} · {question.difficulty}
+            {question.verificationStatus === "needs-verification" && (
+              <strong className="verification-badge">Needs Microsoft Learn verification</strong>
+            )}
+          </p>
           <div className="quiz-question">{question.question}</div>
           <div className="quiz-options">
             {current.options.map((option, optionIndex) => (
@@ -1613,7 +1593,7 @@ function QuizView() {
           {confirmSubmit && (
             <div aria-labelledby="exam-submit-title" className="exam-submit-confirmation" role="group">
               <strong id="exam-submit-title">Submit this exam?</strong>
-              <p>{unansweredCount ? `${unansweredCount} unanswered question${unansweredCount === 1 ? "" : "s"} will count as incorrect.` : "You have answered all 40 questions."} You can still cancel and review your answers.</p>
+              <p>              {unansweredCount ? `${unansweredCount} unanswered question${unansweredCount === 1 ? "" : "s"} will count as incorrect.` : `You have answered all ${attempt.length} questions.`} You can still cancel and review your answers.</p>
               <div>
                 <button className="secondary-control" onClick={() => setConfirmSubmit(false)}>Keep reviewing</button>
                 <button className="primary-button" onClick={submitExam}>Submit final answers</button>
@@ -1640,14 +1620,14 @@ function QuizView() {
           <p>Question {index + 1} of {attempt.length}. Your answers are kept as you navigate.</p>
           <div className="mini-stat"><span>Answered</span><strong>{answeredCount}</strong></div>
           <div className="mini-stat"><span>Remaining</span><strong>{attempt.length - answeredCount}</strong></div>
-          <button className="text-button" onClick={() => { setExamId(null); setAttempt([]); setAnswers({}); setConfirmSubmit(false) }}>Exit to exam list</button>
+          <button className="text-button" onClick={() => { setExamId(null); setConfirmSubmit(false) }}>Exit to exam list</button>
         </aside>
       </div>}
     </section>
   )
 }
 
-function FlashcardsView() {
+function FlashcardsView({ onStudyActivity }: { onStudyActivity: () => void }) {
 
   const allCards = useMemo(
 
@@ -1698,6 +1678,7 @@ function FlashcardsView() {
     setIndex((nextIndex + cards.length) % cards.length)
 
     setFlipped(false)
+    onStudyActivity()
 
   }
 
@@ -1779,7 +1760,10 @@ function FlashcardsView() {
 
           className={`flashcard ${flipped ? "flashcard-flipped" : ""}`}
 
-          onClick={() => setFlipped((value) => !value)}
+          onClick={() => {
+            setFlipped((value) => !value)
+            onStudyActivity()
+          }}
 
         >
 
@@ -2133,7 +2117,7 @@ function StudyPlanView() {
       </div>
       <div className="coverage-card coverage-all-modules">
         <div className="eyebrow">Exam objective coverage</div><div className="coverage-title">Work through all four learning areas.</div>
-        {modules.map((module) => <div className="coverage-row" key={module.id}><span>{module.number}</span><div><strong>{module.shortTitle}</strong><i /></div><b>{module.sections.reduce((total, section) => total + section.concepts.length, 0)} topics</b></div>)}
+        {modules.map((module) => <div className="coverage-row" key={module.id}><span>{module.number}</span><div><strong>{module.shortTitle}</strong><i /></div><b>{module.sections.length} topics · {module.sections.reduce((total, section) => total + section.concepts.length, 0)} lessons</b></div>)}
         <p className="plan-preview-copy">Use the plan alongside lessons, knowledge checks, practice quizzes, flashcards, and case studies. Completion in CloudBridge is a study aid, not a guarantee of passing the official exam.</p>
       </div>
     </section>
@@ -2157,10 +2141,32 @@ function readStoredIndexSet(key: string): Set<number> {
   }
 }
 
+const practiceExamIds = practiceExams.map((exam) => exam.id)
+
+function readBrowserLearningProgress(): {
+  progress: LearningProgress
+  error: string | null
+} {
+  try {
+    return readLearningProgress(window.localStorage, practiceExamIds)
+  } catch {
+    return {
+      progress: createEmptyLearningProgress(),
+      error: "Saved learning progress could not be read. Check browser storage access.",
+    }
+  }
+}
+
 export default function App() {
 
   const [view, setView] = useState<View>("Home")
   const [welcomeCompleted, setWelcomeCompleted] = useState(hasCompletedWelcome)
+  const [initialLearningProgress] = useState(readBrowserLearningProgress)
+  const [learningProgress, setLearningProgress] = useState(initialLearningProgress.progress)
+  const [progressStorageError, setProgressStorageError] = useState(
+    initialLearningProgress.error,
+  )
+  const [learningProgressDirty, setLearningProgressDirty] = useState(false)
 
   const [navOpen, setNavOpen] = useState(false)
   const [selectedModule, setSelectedModule] = useState<number | null>(null)
@@ -2174,6 +2180,24 @@ export default function App() {
   const [completedModules, setCompletedModules] = useState<Set<number>>(() =>
     readStoredIndexSet("cloudbridge-completed-v1"),
   )
+  const legacyCompletedModuleIds = new Set(
+    modules.flatMap((module, index) =>
+      completedModules.has(index) ? [module.id] : [],
+    ),
+  )
+  const learningOverview = getLearningOverview(
+    learningProgress,
+    legacyCompletedModuleIds,
+  )
+  const studyStreak = calculateStudyStreak(learningProgress.studyActivityDays)
+
+  const recordStudyActivity = useCallback(() => {
+    setLearningProgressDirty(true)
+    setLearningProgress((current) => ({
+      ...current,
+      studyActivityDays: addStudyActivityDay(current.studyActivityDays),
+    }))
+  }, [])
 
   useEffect(() => {
     if (!welcomeCompleted) return
@@ -2185,6 +2209,52 @@ export default function App() {
       // CloudBridge remains usable when browser storage is unavailable.
     }
   }, [welcomeCompleted, enrolledModules, startedModules, completedModules])
+
+  useEffect(() => {
+    if (!welcomeCompleted || !learningProgressDirty) return
+    try {
+      setProgressStorageError(
+        writeLearningProgress(window.localStorage, learningProgress),
+      )
+    } catch {
+      setProgressStorageError(
+        "Learning progress could not be saved. Check browser storage access and try again.",
+      )
+    }
+  }, [learningProgress, learningProgressDirty, welcomeCompleted])
+
+  const updateModuleProgress = useCallback(
+    (moduleId: string, progress: ModuleLearningProgress) => {
+      setLearningProgressDirty(true)
+      setLearningProgress((current) => ({
+        ...current,
+        modules: { ...current.modules, [moduleId]: progress },
+      }))
+    },
+    [],
+  )
+
+  const updateExamSession = useCallback(
+    (examId: string, session: ExamSession | null) => {
+      setLearningProgressDirty(true)
+      setLearningProgress((current) => {
+        const practiceExamSessions = { ...current.practiceExamSessions }
+        if (session) practiceExamSessions[examId] = session
+        else delete practiceExamSessions[examId]
+        return { ...current, practiceExamSessions }
+      })
+    },
+    [],
+  )
+
+  const recordCompletedExam = useCallback((attempt: CompletedExamAttempt) => {
+    setLearningProgressDirty(true)
+    setLearningProgress((current) => ({
+      ...current,
+      practiceExamHistory: [...current.practiceExamHistory, attempt],
+      studyActivityDays: addStudyActivityDay(current.studyActivityDays),
+    }))
+  }, [])
 
   function completeWelcome() {
     try {
@@ -2221,6 +2291,11 @@ export default function App() {
   function openModule(index: number) {
     if (index < 0 || index >= modules.length || !enrolledModules.has(index)) return
     setStartedModules((current) => new Set(current).add(index))
+    setLearningProgressDirty(true)
+    setLearningProgress((current) => ({
+      ...current,
+      activeModuleId: modules[index].id,
+    }))
     setSelectedModule(index)
 
     setView("Modules")
@@ -2253,7 +2328,7 @@ export default function App() {
 
       <Sidebar
 
-        completedCount={completedModules.size}
+        learningOverview={learningOverview}
 
         onClose={() => setNavOpen(false)}
 
@@ -2309,6 +2384,10 @@ export default function App() {
 
         <div className="page">
 
+          {progressStorageError && (
+            <p className="plan-error" role="alert">{progressStorageError}</p>
+          )}
+
           {view !== "Home" && (
 
             <header className="page-header">
@@ -2327,15 +2406,13 @@ export default function App() {
 
                 <span>
 
-                  <strong>0 day streak</strong>
+                  <strong>{studyStreak} day{studyStreak === 1 ? "" : "s"} streak</strong>
 
                   <small>
 
-                    {completedModules.size
-
-                      ? `${completedModules.size} module${completedModules.size === 1 ? "" : "s"} complete`
-
-                      : "Complete a module to begin"}
+                    {learningProgress.studyActivityDays.length
+                      ? `${learningOverview.completedLessons} lessons · ${learningProgress.studyActivityDays.length} study day${learningProgress.studyActivityDays.length === 1 ? "" : "s"}`
+                      : "Study a lesson or quiz to begin"}
 
                   </small>
 
@@ -2353,6 +2430,9 @@ export default function App() {
 
               completedModules={completedModules}
               enrolledModules={enrolledModules}
+              learningOverview={learningOverview}
+              learningProgress={learningProgress}
+              legacyCompletedModuleIds={legacyCompletedModuleIds}
               onEnroll={(index) => enrollModule(index, true)}
               onNavigate={navigate}
               onOpenModule={openModule}
@@ -2371,7 +2451,11 @@ export default function App() {
 
               onComplete={completeModule}
               enrolledModules={enrolledModules}
+              learningProgress={learningProgress}
               onEnroll={(index) => enrollModule(index, true)}
+              onProgressChange={updateModuleProgress}
+              onStudyActivity={recordStudyActivity}
+              legacyCompletedModuleIds={legacyCompletedModuleIds}
               onSelect={openModule}
               selectedModule={selectedModule}
 
@@ -2383,14 +2467,26 @@ export default function App() {
             <MyLearningView
               completedModules={completedModules}
               enrolledModules={enrolledModules}
+              learningProgress={learningProgress}
+              legacyCompletedModuleIds={legacyCompletedModuleIds}
               onBrowseModules={() => navigate("Modules")}
               onOpenModule={openModule}
               startedModules={startedModules}
             />
           )}
-          {view === "Practice quizzes" && <QuizView />}
+          {view === "Practice quizzes" && (
+            <QuizView
+              examHistory={learningProgress.practiceExamHistory}
+              onExamCompleted={recordCompletedExam}
+              onSessionChange={updateExamSession}
+              savedSessions={learningProgress.practiceExamSessions}
+              onStudyActivity={recordStudyActivity}
+            />
+          )}
 
-          {view === "Flashcards" && <FlashcardsView />}
+          {view === "Flashcards" && (
+            <FlashcardsView onStudyActivity={recordStudyActivity} />
+          )}
 
           {view === "Case studies" && <CaseStudiesView />}
 
