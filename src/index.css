@@ -3596,3 +3596,20 @@ footer {
 .insights-history-row > span { display: flex; flex-direction: column; gap: 3px; }
 @media (max-width: 700px) { .insights-summary { grid-template-columns: repeat(2,minmax(0,1fr)); } .insights-panel { padding: 15px; } .insights-summary > div { padding: 12px; } }
 @media (max-width: 360px) { .insights-summary { grid-template-columns: 1fr; } }
+
+/* V1.8: Read-only personalised revision queue on Insights and Study Plan. */
+.revision-coach { max-width: 100%; }
+.revision-counts { font-weight: 600; font-size: .95rem; }
+.revision-action-list { list-style: none; padding: 0; margin: 16px 0; display: grid; gap: 12px; }
+.revision-action { border: 1px solid #d8dfe5; border-radius: 12px; padding: 16px; background: var(--surface,#fff); }
+.revision-action-top { display: flex; gap: 12px; justify-content: space-between; flex-wrap: wrap; }
+.revision-action-top strong { font-size: 1rem; line-height: 1.45; }
+.revision-action-top small { font-size: .9rem; white-space: nowrap; }
+.revision-action p { font-size: .93rem; line-height: 1.5; margin: 10px 0; }
+.revision-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.revision-actions button { min-height: 40px; }
+.revision-session-title { font-size: 1.14rem; margin: 24px 0 6px; }
+.revision-session-list { list-style: none; margin: 12px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit,minmax(210px,1fr)); gap: 10px; }
+.revision-session-list li { display: flex; flex-direction: column; gap: 5px; padding: 13px; background: var(--surface,#fff); border: 1px solid #d8dfe5; border-radius: 10px; line-height: 1.45; }
+.revision-session-list span { font-size: .9rem; }
+@media (max-width: 480px) { .revision-actions { flex-direction: column; align-items: stretch; } }

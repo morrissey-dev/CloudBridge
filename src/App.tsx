@@ -44,6 +44,7 @@ import ObjectivesTrackerView from "./components/ObjectivesTrackerView"
 import AzureLabsView from "./components/AzureLabsView"
 import { currentQuestionAudit, summarizeExamReviewStatus } from "./questionQuality"
 import LearningInsightsView from "./components/LearningInsightsView"
+import RevisionCoach from "./components/RevisionCoach"
 import { normalizeScenarioProgress, scenarioProgressStorageKey } from "./scenarioProgress"
 
 function readInsightsScenarioProgress() {
@@ -2075,7 +2076,7 @@ function readStudyPlan(): { values: StudyPlanValues; error: string | null } {
   }
 }
 
-function StudyPlanView() {
+function StudyPlanView({ learningProgress, onOpenModule, onPracticeObjective, onReviewDomain }: { learningProgress: LearningProgress; onOpenModule: (moduleId: string) => void; onPracticeObjective: (objectiveId: string) => void; onReviewDomain: (category: AZ900Category) => void }) {
   const [initialPlan] = useState(readStudyPlan)
   const [examDate, setExamDate] = useState(initialPlan.values.examDate)
   const [weeklyDays, setWeeklyDays] = useState(initialPlan.values.weeklyDays)
@@ -2191,6 +2192,7 @@ function StudyPlanView() {
           <div className="plan-time-total"><Icon name="calendar" size={18} /><span><strong>{sessionsPerWeek * minutesPerSession} minutes</strong><small>planned study time each week</small></span></div>
         </div>
       </div>
+      <RevisionCoach learningProgress={learningProgress} scenarioProgress={readInsightsScenarioProgress()} weeklyDays={sessionsPerWeek} minutes={minutesPerSession} onOpenModule={onOpenModule} onPracticeObjective={onPracticeObjective} onReviewDomain={onReviewDomain} />
       <div className="coverage-card coverage-all-modules">
         <div className="eyebrow">Exam objective coverage</div><div className="coverage-title">Work through all four learning areas.</div>
         {modules.map((module) => <div className="coverage-row" key={module.id}><span>{module.number}</span><div><strong>{module.shortTitle}</strong><i /></div><b>{module.sections.length} topics · {module.sections.reduce((total, section) => total + section.concepts.length, 0)} lessons</b></div>)}
@@ -2333,6 +2335,27 @@ export default function App() {
       studyActivityDays: addStudyActivityDay(current.studyActivityDays),
     }))
   }, [])
+
+  function openRevisionModule(moduleId: string) {
+    const index = modules.findIndex((module) => module.id === moduleId)
+    if (index < 0) return
+    setEnrolledModules((current) => new Set(current).add(index))
+    setStartedModules((current) => new Set(current).add(index))
+    setLearningProgressDirty(true)
+    setLearningProgress((current) => ({ ...current, activeModuleId: moduleId }))
+    setSelectedModule(index)
+    setView("Modules")
+    setNavOpen(false)
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  function practiceRevisionObjective(objectiveId: string) {
+    setScenarioCategory(null)
+    setScenarioObjectiveId(objectiveId)
+    setView("Scenario practice")
+    setNavOpen(false)
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
 
   function completeWelcome() {
     try {
@@ -2576,6 +2599,8 @@ export default function App() {
               learningProgress={learningProgress}
               scenarioProgress={readInsightsScenarioProgress()}
               onBrowseLessons={() => navigate("Modules")}
+              onOpenModule={openRevisionModule}
+              onPracticeObjective={practiceRevisionObjective}
               onReviewDomain={(category) => {
                 setScenarioObjectiveId(null)
                 setScenarioCategory(category)
@@ -2595,7 +2620,7 @@ export default function App() {
             />
           )}
 
-          {view === "Study plan" && <StudyPlanView />}
+          {view === "Study plan" && <StudyPlanView learningProgress={learningProgress} onOpenModule={openRevisionModule} onPracticeObjective={practiceRevisionObjective} onReviewDomain={(category) => { setScenarioObjectiveId(null); setScenarioCategory(category); setView("Scenario practice") }} />}
 
           {enrollmentConfirmation !== null && (
             <EnrollmentConfirmation

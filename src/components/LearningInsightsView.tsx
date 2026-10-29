@@ -1,14 +1,17 @@
+import RevisionCoach from "./RevisionCoach"
 import { getPracticeInsights } from "../learningInsights"
 import { getScenarioOverview, type ScenarioProgress } from "../scenarioProgress"
 import { getLearningOverview } from "../learningStatistics"
 import type { LearningProgress } from "../learningProgress"
 import type { AZ900Category } from "../az900Exam"
 
-export default function LearningInsightsView({ learningProgress, scenarioProgress, onReviewDomain, onBrowseLessons }: {
+export default function LearningInsightsView({ learningProgress, scenarioProgress, onReviewDomain, onBrowseLessons, onOpenModule, onPracticeObjective }: {
   learningProgress: LearningProgress
   scenarioProgress: ScenarioProgress
   onReviewDomain: (category: AZ900Category) => void
   onBrowseLessons: () => void
+  onOpenModule: (moduleId: string) => void
+  onPracticeObjective: (objectiveId: string) => void
 }) {
   const insight = getPracticeInsights(learningProgress.practiceExamHistory)
   const scenarios = getScenarioOverview(scenarioProgress)
@@ -58,6 +61,7 @@ export default function LearningInsightsView({ learningProgress, scenarioProgres
         {insight.recordedAttempts > insight.distinctExams && <p className="exam-verification-note">Your history includes retakes. The domain comparison uses only the most recent attempt per exam to avoid counting repeated questions multiple times.</p>}
         <p className="exam-verification-note">{insight.notesReviewedInLatestExams} of {insight.totalQuestionsInLatestExams} questions in these latest exams have been compared to the supplied notes. None of this bank has independent official-documentation approval.</p>
       </section>
+      <RevisionCoach learningProgress={learningProgress} scenarioProgress={scenarioProgress} onOpenModule={onOpenModule} onPracticeObjective={onPracticeObjective} onReviewDomain={onReviewDomain} />
       <button type="button" className="primary-button" onClick={onBrowseLessons}>Browse learning modules</button>
     </section>
   )

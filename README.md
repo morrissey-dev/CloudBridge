@@ -16,6 +16,15 @@ CloudBridge brings learning and revision tools together in one platform, helping
 
 
 
+## V1.8 additions
+
+- **Personalised revision queue:** Learning Insights and Study Plan show review suggestions based on a learner's latest per-exam wrong/unanswered answers and last scenario attempts. Exam question labels are linked to source objectives only through a curated explicit crosswalk.
+- **Practical study guidance:** Open the relevant module, retry an objective-linked scenario, and view suggested weekly sessions based on study-day and time preferences.
+- **Honest data boundaries:** Unmapped exam mistakes are disclosed rather than arbitrarily linked to source learning objectives. No unverified question is presented as official Microsoft exam readiness evidence.
+- **Safe upgrades:** No new storage keys or migrations, existing records and progress backup unchanged.
+- **Tests:** 70 automated tests pass; TypeScript validates. Build still needs a clean dependency install and local or CI verification.
+- See [`docs/HOW-TO-UPGRADE-V1.8.md`](docs/HOW-TO-UPGRADE-V1.8.md) and [`docs/V1.8-RELEASE-NOTES.md`](docs/V1.8-RELEASE-NOTES.md).
+
 ## V1.6 additions
 
 - **77 scenario questions** aligned to the existing 63 original objectives, including 14 second questions for deeper practice. These are original study exercises, not official exam questions or proof of mastery.
