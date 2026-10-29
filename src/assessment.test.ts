@@ -86,7 +86,7 @@ test("question bank preserves the original questions and exceeds five exam pools
       .filter((question) => question.id.startsWith("added-"))
 
       .every(
-        (question) => question.verificationStatus === "needs-verification",
+        (question) => ["needs-verification", "notes-reviewed"].includes(question.verificationStatus ?? ""),
       ),
   )
 })
@@ -159,4 +159,85 @@ test("unknown practice exams fail explicitly", () => {
     () => createExamAttempt("exam-unknown"),
     /Unknown practice exam/,
   )
+})
+
+test("v1.1 knowledge checks cover every concept within enough rotating attempts", () => {
+  for (const module of modules) {
+    const allConcepts = module.sections.flatMap((section) => section.concepts)
+    const rounds = Math.ceil(allConcepts.length / 10)
+    const attempts = Array.from({ length: rounds }, (_, round) =>
+      createKnowledgeCheckQuestions(module, round),
+    )
+    assert.equal(
+      new Set(attempts.flat().map((question) => question.concept)).size,
+      allConcepts.length,
+    )
+    for (const questions of attempts) {
+      assert.equal(new Set(questions.map((question) => question.concept)).size, questions.length)
+      for (const question of questions) {
+        const concept = allConcepts.find((item) => item.title === question.concept)
+        assert.ok(concept)
+        assert.equal(question.options[question.answer], concept.definition)
+        assert.equal(new Set(question.options).size, 4)
+      }
+    }
+    assert.deepEqual(
+      createKnowledgeCheckQuestions(module, 1),
+      createKnowledgeCheckQuestions(module, 1),
+    )
+  }
+})
+
+test("original in-progress checks retain historical first-ten answer ordering", () => {
+  for (const module of modules) {
+    const concepts = module.sections.flatMap((section) => section.concepts)
+    const original = createKnowledgeCheckQuestions(module, 0, "legacy")
+    assert.deepEqual(original.map((question) => question.concept), concepts.slice(0, 10).map((c) => c.title))
+    assert.deepEqual(original.map((question) => question.answer), [0, 1, 2, 3, 0, 1, 2, 3, 0, 1])
+  }
+})
+
+test("all five practice exams match the documented AZ-900 category weighting", () => {
+  for (const pool of practiceExamPools) {
+    const counts = pool.reduce<Record<string, number>>((result, question) => {
+      result[question.category] = (result[question.category] ?? 0) + 1
+      return result
+    }, {})
+    assert.deepEqual(counts, {
+      "Cloud concepts": 13,
+      "Azure architecture and services": 18,
+      "Azure management and governance": 14,
+    })
+  }
+  assert.equal(
+    new Set(practiceExamPools.flat().map((question) => question.id)).size,
+    225,
+  )
+  assert.throws(
+    () => createPracticeExamPools(az900ExamQuestions.filter((q) => q.category !== "Azure management and governance")),
+    /Not enough Azure management and governance questions/,
+  )
+})
+
+test("identity and access questions follow the official architecture-services domain", () => {
+  for (const id of ["gov-11", "gov-12", "gov-13", "added-163", "added-166", "added-167", "added-168", "added-171"]) {
+    const question = az900ExamQuestions.find((item) => item.id === id)
+    assert.ok(question)
+    assert.equal(question.category, "Azure architecture and services")
+  }
+  assert.equal(
+    az900ExamQuestions.filter((question) => question.id.startsWith("added-gov-source-")).length,
+    18,
+  )
+})
+
+test("each bank question has four distinct answers and a matching key", () => {
+  assert.equal(az900ExamQuestions.length, 264)
+  assert.equal(new Set(az900ExamQuestions.map((question) => question.id)).size, 264)
+  for (const item of az900ExamQuestions) {
+    assert.equal(item.options.length, 4)
+    assert.equal(new Set(item.options).size, 4)
+    assert.ok(item.options.includes(item.correctAnswer), `Missing correct choice in ${item.id}`)
+    assert.ok(item.explanation.trim().length > 30, `Missing explanation for ${item.id}`)
+  }
 })

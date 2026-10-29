@@ -1,73 +1,108 @@
-\# CloudBridge
+# CloudBridge
 
-\*\*Your bridge to Azure cloud confidence.\*\*
+**Your bridge to Azure cloud confidence.**
+
+**Version 1.9.0:** 18 source-notes-reviewed governance questions now have individual answer-choice explanations; practice-exam results have a missed-question filter, and the editorial CSV exports those explanations and suggested official reading links. These are *editorial study aids*, not independent certification of the question bank.
 
 CloudBridge is an unofficial Microsoft Azure Fundamentals (AZ-900) learning platform designed to help learners study cloud concepts, practise exam-style questions, and revise key topics in a structured way.
 
 
-\## The Problem
+## The Problem
 
 Learners preparing for AZ-900 need to understand a broad range of cloud concepts, Azure services, and management and governance topics. Relying on passive reading alone can make it difficult to identify knowledge gaps and prepare effectively.
 
 
-\## The Solution
+## The Solution
 
 CloudBridge brings learning and revision tools together in one platform, helping learners study concepts, test their understanding, and organise their preparation.
 
 
 
-\## Key Features
+## V1.8 additions
+
+- **Personalised revision queue:** Learning Insights and Study Plan show review suggestions based on a learner's latest per-exam wrong/unanswered answers and last scenario attempts. Exam question labels are linked to source objectives only through a curated explicit crosswalk.
+- **Practical study guidance:** Open the relevant module, retry an objective-linked scenario, and view suggested weekly sessions based on study-day and time preferences.
+- **Honest data boundaries:** Unmapped exam mistakes are disclosed rather than arbitrarily linked to source learning objectives. No unverified question is presented as official Microsoft exam readiness evidence.
+- **Safe upgrades:** No new storage keys or migrations, existing records and progress backup unchanged.
+- **Tests:** 70 automated tests pass; TypeScript validates. Build still needs a clean dependency install and local or CI verification.
+- See [`docs/HOW-TO-UPGRADE-V1.8.md`](docs/HOW-TO-UPGRADE-V1.8.md) and [`docs/V1.8-RELEASE-NOTES.md`](docs/V1.8-RELEASE-NOTES.md).
+
+## V1.6 additions
+
+- **77 scenario questions** aligned to the existing 63 original objectives, including 14 second questions for deeper practice. These are original study exercises, not official exam questions or proof of mastery.
+- **Two optional hands-on paths** linked to Microsoft resources: a pricing-estimate activity requiring no deployment, and an NSG tutorial that may create billable Azure resources. CloudBridge makes **no** Azure API requests and stores only self-reported checklist ticks.
+- **Per-exam review disclosure** shows how many questions were compared with the supplied notes, explicitly flagged for review, or have no review classification. The existing 264-question bank has not been independently certified.
+- **Safe backup support** for optional hands-on checklist progress; earlier keys, question IDs, saved sessions, labs and scenarios remain compatible.
+- **GitHub Actions CI** for tests, TypeScript and a clean production build on Node.js 22 (must be confirmed when pushed to GitHub).
+- Read [`docs/HOW-TO-UPGRADE-V1.6.md`](docs/HOW-TO-UPGRADE-V1.6.md), [`docs/V1.6-RELEASE-NOTES.md`](docs/V1.6-RELEASE-NOTES.md), and [`docs/QUESTION-VERIFICATION-PLAN-V1.6.md`](docs/QUESTION-VERIFICATION-PLAN-V1.6.md).
+
+## V1.5 additions
+
+- **63 scenario questions**, one or more mapped to each of the 63 distinct original handout objectives; a single question does not prove mastery.
+- **Two guided, offline-simulated labs**: Azure Storage choices and network-access planning (four steps each). They do not access an Azure subscription or deploy resources.
+- **Six separate Azure Storage objectives** from the detailed notes / current AZ-900 guide, without altering the original handout objectives.
+- **Saved lab results** through `cloudbridge-lab-progress-v1`, included in backup/restore. Existing progress keys and question IDs remain unchanged.
+- Read [`docs/HOW-TO-UPGRADE-V1.5.md`](docs/HOW-TO-UPGRADE-V1.5.md) and [`docs/V1.5-RELEASE-NOTES.md`](docs/V1.5-RELEASE-NOTES.md) before applying the upgrade.
+
+## V1.4 additions
+
+- **36 objective-linked scenarios**, with topic filters, review of incorrect latest answers, and navigation from the objectives tracker.
+- **Source review transparency:** 18 existing governance exam questions compared with the learner-provided Azure notes; all unreviewed items remain marked accordingly. This is not Microsoft validation.
+- **Curriculum gap register** compares the learner's separate objective list with the official AZ-900 guide, including the Azure storage topics in the full notes.
+- **Compatibility:** preserved all existing localStorage keys and all original scenario IDs. See `docs/V1.4-RELEASE-NOTES.md` and `docs/HOW-TO-UPGRADE-V1.4.md`.
+
+## Key Features
 
 
-\- \*\*Learning Modules:\*\* Explore structured Azure Fundamentals learning content.
+- **Learning Modules:** Explore structured Azure Fundamentals learning content.
 
-\- \*\*Practice Quizzes:\*\* Take one of five randomized, non-overlapping 45-question AZ-900 practice exams with area-level scoring and answer review. New questions are visibly marked for verification against official Microsoft Learn documentation.
+- **Practice Quizzes:** Take one of five randomized, non-overlapping 45-question AZ-900 practice exams with area-level scoring and answer review. New questions are visibly marked for verification against official Microsoft Learn documentation.
 
-\- \*\*Flashcards:\*\* Review key terms and concepts.
+- **Flashcards:** Review key terms and concepts.
 
-\- \*\*Case Studies:\*\* Apply cloud concepts to practical scenarios.
+- **Case Studies:** Apply cloud concepts to practical scenarios.
 
-\- \*\*Study Planner:\*\* Organise revision sessions and learning goals.
+- **Study Planner:** Organise revision sessions and learning goals.
 
-\- \*\*My Learning:\*\* Track enrolled modules and learning progress.
+- **My Learning:** Track enrolled modules and learning progress.
 
 
 
-\## AZ-900 Learning Areas
+## AZ-900 Learning Areas
 
 
 CloudBridge is designed around the Azure Fundamentals learning objectives, including:
 
-\- Cloud concepts
+- Cloud concepts
 
-\- Azure architecture and services
+- Azure architecture and services
 
-\- Azure management and governance
-
-
-
-\## Technology Stack
-
-\- React
-
-\- TypeScript
-
-\- Vite
-
-\- CSS
+- Azure management and governance
 
 
 
-\## Getting Started
+## Technology Stack
 
-\### Prerequisites
+- React
+
+- TypeScript
+
+- Vite
+
+- CSS
 
 
 
-Install \[Node.js](https://nodejs.org/) and npm.
+## Getting Started
+
+### Prerequisites
 
 
-\### Installation
+
+Install [Node.js](https://nodejs.org/) and npm.
+
+
+### Installation
 
 
 
@@ -104,7 +139,7 @@ Follow the local URL printed in your terminal to open the application.
 
 
 
-\### Production Build
+### Production Build
 
 Run:
 
@@ -116,18 +151,63 @@ npm run build
 
 
 
-\## Progress and Data
+## Progress and Data
 
 Study plans and learning progress are stored locally in the browser where supported by the application. Lesson positions, completed lessons, knowledge-check answers and results, unfinished practice exams, and completed exam history are included. Progress is not necessarily synchronised between different devices or browsers.
 
 The first-visit welcome screen stores its completion flag separately in browser local storage; it does not replace or reset learning progress. Existing enrollment, started-module, and completed-module data remains in its original storage keys. Curriculum topic and lesson counts, module completion percentages, assessment results, exam averages, daily study dates, and consecutive-day streaks are calculated from saved progress and the curriculum. Study activity is recorded when a learner completes lesson steps, submits quiz answers, or reviews flashcards; multiple study actions on one local calendar day count as one study day.
 
-\## Project Status
+## Project Status
 
 CloudBridge is a learning project intended to support Azure Fundamentals preparation. It is not an official Microsoft product, and it does not replace Microsoft's official learning materials.
 
 
 
-\## Repository
+## Repository
 
-\[https://github.com/morrissey-dev/CloudBridge](https://github.com/morrissey-dev/CloudBridge)
+[https://github.com/morrissey-dev/CloudBridge](https://github.com/morrissey-dev/CloudBridge)
+
+## Version 1.1 — Source-aligned assessment improvements
+
+- 63 unique objectives from the user-provided learning objectives document are linked to existing lessons. See `docs/learning-objective-alignment.csv`.
+- New assessments select 10 concepts from across module sections, rotating through the complete curriculum across repeated attempts. Old, partially completed assessments continue using their original questions and answers until a retry.
+- Five independent 45-question exams each contain 13 cloud concepts, 18 architecture/services and 14 management/governance questions, matching the AZ-900 target percentage bands.
+- Reclassified identity/access/security questions into their official AZ-900 area and added 18 source-based governance study questions.
+- The dashboard's knowledge-check-completion count represents distinct modules with passing checks, not the number of retries.
+- Practice exam raw percentages are labelled as CloudBridge scores rather than Microsoft certification scaled scores.
+
+**Content limitation:** New exam questions are marked for independent verification. Mapping an objective to a lesson does not prove the learner has mastered that objective; in particular, network-access configuration needs a hands-on exercise. CloudBridge is not affiliated with Microsoft and makes no certification guarantee.
+
+**Deployment:** On a computer with network access, run `npm ci`, `npm test`, `npx tsc --noEmit`, and `npm run build`. If a native binding error appears after copying `node_modules` from another operating system, remove that `node_modules` directory and run a clean installation using `npm ci`.
+
+
+## Version 1.2 — Objective-linked scenario practice (first milestone)
+
+- Added a **Scenario practice** page with 12 original applied-decision questions (four per AZ-900 domain).
+- Each question references an objective from the supplied `Learning objective.docx`, and the scenarios were authored using `Microsoft Azure.docx` as the study reference.
+- Learners choose answers, receive explanations and takeaways, and can retry. Latest results and attempt counts are saved in `cloudbridge-scenario-practice-v1`, independently of the existing lesson, quiz, and exam local-storage keys.
+- Added unit tests for scenario validation and saved-answer normalization.
+- This first milestone covers **12 of 63** mapped objectives. It is not a full objective-mastery system. Existing exam questions marked for verification are still pending review.
+- Production build was **not verified** in the development container because the uploaded dependency copy lacks Vite's native binding; install fresh dependencies on your machine with `npm ci`.
+
+### Upgrading without losing your code
+
+See [`docs/HOW-TO-UPGRADE-V1.2.md`](docs/HOW-TO-UPGRADE-V1.2.md).
+Use the incremental patch on a clean v1.1 working tree, not by overwriting your existing folder with this archive.
+
+## Version 1.3 — Objective progress and learner backups
+
+- Added a searchable **Learning objectives** screen covering all 63 distinct objectives from the uploaded study-outcomes document.
+- Separated learner self-confidence from objective-linked lesson completion and scenario performance; these signals do not assert examination readiness.
+- Added private, browser-based progress backup and restore for CloudBridge data only, with import confirmation.
+- Added dynamic question-bank review counts: 224 of 264 questions explicitly require verification; the remaining 40 are not independently certified or reviewed.
+- Existing V1.2 saved progress keys and scenario-answer schema remain unchanged.
+- Expanded automated tests to 41 passing cases; TypeScript check passed. Production Vite build still needs a clean local dependency install to verify.
+
+See `docs/V1.3-RELEASE-NOTES.md` and `docs/HOW-TO-UPGRADE-V1.3.md` for details.
+
+## CloudBridge V1.7 — Learning insights and question review
+
+Open **Learning insights** in the sidebar to review latest-per-exam performance by AZ-900 domain, recent attempts, and targeted scenario-practice links. Results are descriptive practice activity only, not validated exam predictions. Retakes do not inflate the domain chart.
+
+Run `npm run review:export` to regenerate `docs/QUESTION-REVIEW-QUEUE-V1.7.csv` from the source question bank; this does not mark any question approved. See `docs/INITIAL-MICROREVIEW-V1.7.md` for the small Microsoft Learn cross-check and its review limitations. Upgrade instructions: `docs/HOW-TO-UPGRADE-V1.7.md`.

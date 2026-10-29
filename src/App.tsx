@@ -36,8 +36,27 @@ import {
   getLearningOverview,
   getModuleLessonProgress,
 } from "./learningStatistics"
+import { getObjectivesForModule } from "./learningObjectives"
 import Icon, { type IconName } from "./components/Icon"
 import ModuleCard from "./components/ModuleCard"
+import ScenarioPracticeView from "./components/ScenarioPracticeView"
+import ObjectivesTrackerView from "./components/ObjectivesTrackerView"
+import AzureLabsView from "./components/AzureLabsView"
+import { currentQuestionAudit, summarizeExamReviewStatus } from "./questionQuality"
+import { getAuthoredChoiceFeedback, getFeedbackCoverage, getFurtherReading } from "./examFeedback"
+import { countMissedAnswers, filterExamReview, type ExamReviewFilter } from "./examReview"
+import LearningInsightsView from "./components/LearningInsightsView"
+import RevisionCoach from "./components/RevisionCoach"
+import { normalizeScenarioProgress, scenarioProgressStorageKey } from "./scenarioProgress"
+
+function readInsightsScenarioProgress() {
+  try {
+    const saved = window.localStorage.getItem(scenarioProgressStorageKey)
+    return saved ? normalizeScenarioProgress(JSON.parse(saved)) : {}
+  } catch {
+    return {}
+  }
+}
 
 type View =
 
@@ -52,6 +71,12 @@ type View =
   | "Flashcards"
 
   | "Case studies"
+
+  | "Scenario practice"
+
+  | "Learning objectives"
+  | "Learning insights"
+  | "Azure labs"
 
   | "Study plan"
 
@@ -68,6 +93,13 @@ const navItems: { label: View; icon: IconName }[] = [
   { label: "Flashcards", icon: "cards" },
 
   { label: "Case studies", icon: "target" },
+
+  { label: "Scenario practice", icon: "quiz" },
+
+  { label: "Learning objectives", icon: "target" },
+  { label: "Learning insights", icon: "check" },
+
+  { label: "Azure labs", icon: "book" },
 
   { label: "Study plan", icon: "calendar" },
 
@@ -588,10 +620,19 @@ function ModuleDetail({
 
   )
 
-  const assessment = useMemo(
-    () => createKnowledgeCheckQuestions(module),
-    [module],
+  const [assessmentVersion, setAssessmentVersion] = useState<"legacy" | "v2">(
+    savedProgress.assessmentVersion ?? "legacy",
   )
+  const [assessmentRound, setAssessmentRound] = useState(
+    savedProgress.finished
+      ? Math.max(0, savedProgress.assessmentAttempts.length - 1)
+      : savedProgress.assessmentAttempts.length,
+  )
+  const assessment = useMemo(
+    () => createKnowledgeCheckQuestions(module, assessmentRound, assessmentVersion),
+    [module, assessmentRound, assessmentVersion],
+  )
+  const sourceObjectives = useMemo(() => getObjectivesForModule(module.id), [module.id])
 
   const [phase, setPhase] = useState<"lessons" | "assessment">(savedProgress.phase)
 
@@ -647,6 +688,7 @@ function ModuleDetail({
       score,
       finished,
       assessmentAttempts,
+      assessmentVersion,
     }
     if (JSON.stringify(progress) !== JSON.stringify(savedProgress)) {
       onProgressChange(module.id, progress)
@@ -654,6 +696,7 @@ function ModuleDetail({
   }, [
     answers,
     assessmentAttempts,
+    assessmentVersion,
     completedLessonIndexes,
     finished,
     lessonIndex,
@@ -705,6 +748,9 @@ function ModuleDetail({
 
   function retryAssessment() {
 
+    // Start the new source-aligned rotation only after resetting prior answers.
+    setAssessmentRound(assessmentAttempts.length)
+    setAssessmentVersion("v2")
     setQuestionIndex(0)
 
     setSelected(null)
@@ -781,6 +827,20 @@ function ModuleDetail({
 
       </section>
 
+      <details className="source-objective-details">
+        <summary>View all {sourceObjectives.length} objectives from your Azure study notes</summary>
+        <ol>
+          {sourceObjectives.map((objective) => (
+            <li key={objective.id}>
+              {objective.text}
+              {objective.kind === "guided-practice" && (
+                <span className="objective-practice-tag">Requires hands-on practice</span>
+              )}
+            </li>
+          ))}
+        </ol>
+      </details>
+
       {phase === "lessons" ? (
 
         <section className="lesson-player">
@@ -824,6 +884,17 @@ function ModuleDetail({
             </div>
 
             <div className="guided-lesson-title">{lesson.title}</div>
+
+            {sourceObjectives.some((objective) => objective.lessonTitle === lesson.title) && (
+              <div className="lesson-objectives">
+                <strong>From your learning objectives</strong>
+                <ul>
+                  {sourceObjectives.filter((objective) => objective.lessonTitle === lesson.title).map((objective) => (
+                    <li key={objective.id}>{objective.text}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             <p>{lesson.definition}</p>
 
@@ -916,7 +987,7 @@ function ModuleDetail({
 
                 Complete the assessment successfully to enable module completion
 
-                and unlock the next module.
+                before marking this module complete. All modules remain available to explore.
 
               </p>
 
@@ -1357,6 +1428,7 @@ function QuizView({
   )
   const [finished, setFinished] = useState(false)
   const [confirmSubmit, setConfirmSubmit] = useState(false)
+  const [reviewFilter, setReviewFilter] = useState<ExamReviewFilter>("all")
   const exam = practiceExams.find((item) => item.id === examId) ?? null
   const current = attempt[index]
   const question = current?.question
@@ -1377,6 +1449,7 @@ function QuizView({
     setAnswers(session.answers)
     setFinished(false)
     setConfirmSubmit(false)
+    setReviewFilter("all")
   }
 
   function selectAnswer(answer: string) {
@@ -1437,8 +1510,8 @@ function QuizView({
         <div className="view-intro">
           <div className="eyebrow">Exam practice</div>
           <div className="view-title">Build confidence, one practice exam at a time.</div>
-          <p>Each attempt contains 45 questions from its own fixed pool across the three AZ-900 knowledge areas. Question and answer order are randomized. Answers and explanations appear in your results review.</p>
-          <p className="exam-verification-note">Questions marked “Needs Microsoft Learn verification” are new original study questions pending documentation review.</p>
+          <p>Each exam contains 45 non-overlapping questions: 13 cloud concepts, 18 architecture and services, and 14 management and governance. Question and answer order are randomized. Answers and explanations appear in your results review.</p>
+          <p className="exam-verification-note">{currentQuestionAudit.flaggedForVerification} of {currentQuestionAudit.total} questions are explicitly flagged for verification. {currentQuestionAudit.notesReviewed} have been checked against the supplied notes (not independently verified against current service documentation); {currentQuestionAudit.unclassified} have no review status. These scores are for CloudBridge study practice, not a Microsoft exam-readiness prediction.</p>
         </div>
         <div className="module-card-grid exam-choice-grid">
           {practiceExams.map((item, examIndex) => (
@@ -1446,6 +1519,7 @@ function QuizView({
               <div className="module-card-number">0{examIndex + 1}</div>
               <div className="module-card-icon"><Icon name="quiz" size={24} /></div>
               <div className="module-card-meta">{practiceExamPools[examIndex].length} questions · Mixed difficulty</div>
+              <p className="exam-verification-note">{summarizeExamReviewStatus(practiceExamPools[examIndex]).flaggedForVerification} flagged for verification · {summarizeExamReviewStatus(practiceExamPools[examIndex]).notesReviewed} notes-reviewed · {summarizeExamReviewStatus(practiceExamPools[examIndex]).unclassified} not reviewed.</p>
               <div className="module-card-title">{item.title}</div>
               <p>{item.subtitle}</p>
               <button className="primary-button" onClick={() => startExam(item.id)}>
@@ -1500,11 +1574,12 @@ function QuizView({
 
     return (
       <section className="quiz-view">
-        <div className={`assessment-result exam-result ${percentage >= 70 ? "result-pass" : ""}`}>
-          <div className="result-icon"><Icon name={percentage >= 70 ? "check" : "book"} size={27} /></div>
+        <div className="assessment-result exam-result">
+          <div className="result-icon"><Icon name="book" size={27} /></div>
           <div className="eyebrow">{exam.title} complete</div>
           <div className="result-title">{score} out of {attempt.length}</div>
-          <p>{percentage}% correct · Unanswered questions count as incorrect.</p>
+          <p>{percentage}% correct · CloudBridge practice percentage (not Microsoft's scaled exam score). Unanswered questions count as incorrect.</p>
+          <p className="exam-verification-note">This specific attempt includes {summarizeExamReviewStatus(attempt.map((item) => item.question)).flaggedForVerification} flagged questions, {summarizeExamReviewStatus(attempt.map((item) => item.question)).notesReviewed} questions checked against the supplied notes, and {summarizeExamReviewStatus(attempt.map((item) => item.question)).unclassified} questions with no review classification. None is certified as an official Microsoft question.</p>
           <div className="result-category-grid">
             {examCategories.map((category) => {
               const categoryQuestions = attempt.filter((item) => item.question.category === category)
@@ -1531,21 +1606,36 @@ function QuizView({
         </div>
         <section aria-label="Exam answer review" className="exam-review">
           <div className="view-title">Answer review</div>
-          {attempt.map(({ question: item }, questionIndex) => (
+          <p className="exam-verification-note">{getFeedbackCoverage(attempt.map(entry => entry.question)).withAuthoredFeedback} of {attempt.length} questions in this attempt include detailed feedback for each answer choice. Other questions show their existing general explanations pending further editorial review.</p>
+          <div className="result-actions" role="group" aria-label="Filter reviewed questions">
+            <button className="secondary-control" aria-pressed={reviewFilter === "all"} onClick={() => setReviewFilter("all")}>All questions ({attempt.length})</button>
+            <button className="secondary-control" aria-pressed={reviewFilter === "missed"} onClick={() => setReviewFilter("missed")}>Incorrect &amp; unanswered ({countMissedAnswers(attempt, answers)})</button>
+          </div>
+          {filterExamReview(attempt, answers, reviewFilter).length === 0 && <p>All questions were answered correctly in this attempt.</p>}
+          {filterExamReview(attempt, answers, reviewFilter).map(({ question: item }) => (
             <details className="exam-review-item" key={item.id}>
               <summary>
-                <span>Question {questionIndex + 1}: {item.question}</span>
+                <span>Question {attempt.findIndex(entry => entry.question.id === item.id) + 1}: {item.question}</span>
                 <b>{answers[item.id] === item.correctAnswer ? "Correct" : answers[item.id] ? "Incorrect" : "Unanswered"}</b>
               </summary>
               <div className="exam-review-content">
                 <p><strong>Your answer:</strong> {answers[item.id] ?? "Not answered"}</p>
                 <p><strong>Correct answer:</strong> {item.correctAnswer}</p>
                 <p>{item.explanation}</p>
+                {answers[item.id] && getAuthoredChoiceFeedback(item, answers[item.id]) && (
+                  <p className="exam-choice-feedback"><strong>Why your choice {answers[item.id] === item.correctAnswer ? "fits" : "doesn't fit"}:</strong> {getAuthoredChoiceFeedback(item, answers[item.id])}</p>
+                )}
                 <small>{item.category} · {item.objective} · {item.difficulty}</small>
+                {getFurtherReading(item) && (
+                  <p className="exam-verification-note">Further reading: <a href={getFurtherReading(item)!} target="_blank" rel="noopener noreferrer">Microsoft Learn reference</a> (does not imply official approval of this practice question).</p>
+                )}
                 {item.verificationStatus === "needs-verification" && (
                   <p className="exam-verification-note">
                     Needs verification against official Microsoft Learn documentation.
                   </p>
+                )}
+                {item.verificationStatus === "notes-reviewed" && (
+                  <p className="exam-verification-note">Checked against supplied Azure notes; independent Microsoft documentation review remains pending.</p>
                 )}
               </div>
             </details>
@@ -1570,6 +1660,9 @@ function QuizView({
             {question.objective} · {question.difficulty}
             {question.verificationStatus === "needs-verification" && (
               <strong className="verification-badge">Needs Microsoft Learn verification</strong>
+            )}
+            {question.verificationStatus === "notes-reviewed" && (
+              <strong className="verification-badge">Compared with supplied Azure notes</strong>
             )}
           </p>
           <div className="quiz-question">{question.question}</div>
@@ -1999,7 +2092,7 @@ function readStudyPlan(): { values: StudyPlanValues; error: string | null } {
   }
 }
 
-function StudyPlanView() {
+function StudyPlanView({ learningProgress, onOpenModule, onPracticeObjective, onReviewDomain }: { learningProgress: LearningProgress; onOpenModule: (moduleId: string) => void; onPracticeObjective: (objectiveId: string) => void; onReviewDomain: (category: AZ900Category) => void }) {
   const [initialPlan] = useState(readStudyPlan)
   const [examDate, setExamDate] = useState(initialPlan.values.examDate)
   const [weeklyDays, setWeeklyDays] = useState(initialPlan.values.weeklyDays)
@@ -2115,6 +2208,7 @@ function StudyPlanView() {
           <div className="plan-time-total"><Icon name="calendar" size={18} /><span><strong>{sessionsPerWeek * minutesPerSession} minutes</strong><small>planned study time each week</small></span></div>
         </div>
       </div>
+      <RevisionCoach learningProgress={learningProgress} scenarioProgress={readInsightsScenarioProgress()} weeklyDays={sessionsPerWeek} minutes={minutesPerSession} onOpenModule={onOpenModule} onPracticeObjective={onPracticeObjective} onReviewDomain={onReviewDomain} />
       <div className="coverage-card coverage-all-modules">
         <div className="eyebrow">Exam objective coverage</div><div className="coverage-title">Work through all four learning areas.</div>
         {modules.map((module) => <div className="coverage-row" key={module.id}><span>{module.number}</span><div><strong>{module.shortTitle}</strong><i /></div><b>{module.sections.length} topics · {module.sections.reduce((total, section) => total + section.concepts.length, 0)} lessons</b></div>)}
@@ -2160,6 +2254,8 @@ function readBrowserLearningProgress(): {
 export default function App() {
 
   const [view, setView] = useState<View>("Home")
+  const [scenarioObjectiveId, setScenarioObjectiveId] = useState<string | null>(null)
+  const [scenarioCategory, setScenarioCategory] = useState<AZ900Category | null>(null)
   const [welcomeCompleted, setWelcomeCompleted] = useState(hasCompletedWelcome)
   const [initialLearningProgress] = useState(readBrowserLearningProgress)
   const [learningProgress, setLearningProgress] = useState(initialLearningProgress.progress)
@@ -2256,6 +2352,27 @@ export default function App() {
     }))
   }, [])
 
+  function openRevisionModule(moduleId: string) {
+    const index = modules.findIndex((module) => module.id === moduleId)
+    if (index < 0) return
+    setEnrolledModules((current) => new Set(current).add(index))
+    setStartedModules((current) => new Set(current).add(index))
+    setLearningProgressDirty(true)
+    setLearningProgress((current) => ({ ...current, activeModuleId: moduleId }))
+    setSelectedModule(index)
+    setView("Modules")
+    setNavOpen(false)
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  function practiceRevisionObjective(objectiveId: string) {
+    setScenarioCategory(null)
+    setScenarioObjectiveId(objectiveId)
+    setView("Scenario practice")
+    setNavOpen(false)
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
   function completeWelcome() {
     try {
       window.localStorage.setItem(welcomeCompletedKey, "true")
@@ -2267,6 +2384,7 @@ export default function App() {
 
   function navigate(nextView: View) {
 
+    if (nextView === "Scenario practice") setScenarioObjectiveId(null)
     setView(nextView)
 
     setNavOpen(false)
@@ -2490,7 +2608,35 @@ export default function App() {
 
           {view === "Case studies" && <CaseStudiesView />}
 
-          {view === "Study plan" && <StudyPlanView />}
+          {view === "Scenario practice" && <ScenarioPracticeView onStudyActivity={recordStudyActivity} initialObjectiveId={scenarioObjectiveId} initialCategory={scenarioCategory} />}
+
+          {view === "Learning insights" && (
+            <LearningInsightsView
+              learningProgress={learningProgress}
+              scenarioProgress={readInsightsScenarioProgress()}
+              onBrowseLessons={() => navigate("Modules")}
+              onOpenModule={openRevisionModule}
+              onPracticeObjective={practiceRevisionObjective}
+              onReviewDomain={(category) => {
+                setScenarioObjectiveId(null)
+                setScenarioCategory(category)
+                navigate("Scenario practice")
+              }}
+            />
+          )}
+
+          {view === "Azure labs" && <AzureLabsView onStudyActivity={recordStudyActivity} />}
+
+          {view === "Learning objectives" && (
+            <ObjectivesTrackerView
+              learningProgress={learningProgress}
+              legacyCompletedModuleIds={legacyCompletedModuleIds}
+              onBrowseModules={() => navigate("Modules")}
+              onOpenScenarios={(objectiveId) => { setScenarioCategory(null); setScenarioObjectiveId(objectiveId); navigate("Scenario practice") }}
+            />
+          )}
+
+          {view === "Study plan" && <StudyPlanView learningProgress={learningProgress} onOpenModule={openRevisionModule} onPracticeObjective={practiceRevisionObjective} onReviewDomain={(category) => { setScenarioObjectiveId(null); setScenarioCategory(category); setView("Scenario practice") }} />}
 
           {enrollmentConfirmation !== null && (
             <EnrollmentConfirmation

@@ -1,3 +1,4 @@
+import { sourceGovernanceQuestions } from "./az900GovernanceQuestions.ts"
 export type AZ900Category =
   | "Cloud concepts"
   | "Azure architecture and services"
@@ -14,7 +15,8 @@ export type AZ900Question = {
   options: [string, string, string, string]
   correctAnswer: string
   explanation: string
-  verificationStatus?: "needs-verification"
+  verificationStatus?: "needs-verification" | "notes-reviewed"
+  reviewSource?: string
 }
 
 const originalAZ900ExamQuestions: AZ900Question[] = [
@@ -574,8 +576,16 @@ const originalAZ900ExamQuestions: AZ900Question[] = [
   },
 ]
 
+// These questions cover identity, access, or security, which belong to
+// AZ-900 "Azure architecture and services" (skills measured July 20, 2026).
+const identityAndSecurityIds = new Set(["gov-11", "gov-12", "gov-13", "added-162", "added-163", "added-164", "added-165", "added-166", "added-167", "added-168", "added-169", "added-170", "added-171", "added-196", "added-197", "added-200", "added-201", "added-202"])
+
 export const az900ExamQuestions: AZ900Question[] = [
   ...originalAZ900ExamQuestions,
   ...additionalAZ900Questions,
-]
+  ...sourceGovernanceQuestions,
+].map((question) => identityAndSecurityIds.has(question.id)
+  ? { ...question, category: "Azure architecture and services" as AZ900Category }
+  : question)
+
 import { additionalAZ900Questions } from "./az900AdditionalQuestions.ts"
