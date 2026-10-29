@@ -1,7 +1,7 @@
 import test from "node:test"
 import assert from "node:assert/strict"
 import { az900ExamQuestions } from "./az900Exam.ts"
-import { auditQuestionBank } from "./questionQuality.ts"
+import { auditQuestionBank, summarizeExamReviewStatus } from "./questionQuality.ts"
 
 test("question bank audit exposes verification pending without calling unflagged questions verified", () => {
   const audit = auditQuestionBank(az900ExamQuestions)
@@ -23,4 +23,13 @@ test("question audit detects malformed answer lists and repeated question identi
   assert.deepEqual(result.invalidAnswers, [first.id])
   assert.deepEqual(result.missingExplanations, [first.id])
   assert.deepEqual(result.duplicatedStems, [first.id])
+})
+
+
+test("individual exam review disclosure never implies that notes-only review is Microsoft verification", () => {
+  const bank = az900ExamQuestions
+  const summary = summarizeExamReviewStatus(bank.slice(0, 40))
+  assert.equal(summary.total, 40)
+  assert.equal(summary.independentlyVerified, 0)
+  assert.equal(summary.flaggedForVerification + summary.notesReviewed + summary.unclassified, 40)
 })

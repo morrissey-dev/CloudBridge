@@ -16,6 +16,15 @@ CloudBridge brings learning and revision tools together in one platform, helping
 
 
 
+## V1.6 additions
+
+- **77 scenario questions** aligned to the existing 63 original objectives, including 14 second questions for deeper practice. These are original study exercises, not official exam questions or proof of mastery.
+- **Two optional hands-on paths** linked to Microsoft resources: a pricing-estimate activity requiring no deployment, and an NSG tutorial that may create billable Azure resources. CloudBridge makes **no** Azure API requests and stores only self-reported checklist ticks.
+- **Per-exam review disclosure** shows how many questions were compared with the supplied notes, explicitly flagged for review, or have no review classification. The existing 264-question bank has not been independently certified.
+- **Safe backup support** for optional hands-on checklist progress; earlier keys, question IDs, saved sessions, labs and scenarios remain compatible.
+- **GitHub Actions CI** for tests, TypeScript and a clean production build on Node.js 22 (must be confirmed when pushed to GitHub).
+- Read [`docs/HOW-TO-UPGRADE-V1.6.md`](docs/HOW-TO-UPGRADE-V1.6.md), [`docs/V1.6-RELEASE-NOTES.md`](docs/V1.6-RELEASE-NOTES.md), and [`docs/QUESTION-VERIFICATION-PLAN-V1.6.md`](docs/QUESTION-VERIFICATION-PLAN-V1.6.md).
+
 ## V1.5 additions
 
 - **63 scenario questions**, one or more mapped to each of the 63 distinct original handout objectives; a single question does not prove mastery.

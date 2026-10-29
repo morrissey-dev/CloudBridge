@@ -22,10 +22,10 @@ test("lesson completion and scenario answers are independent evidence of practic
   const scenario = scenarioQuestions[0]
   const objective = sourceLearningObjectives.find((item) => item.id === scenario.objectiveId)!
   const evidenceBefore = getObjectiveEvidence(objective.id, progress, {})
-  assert.deepEqual(evidenceBefore, { lessonCompleted: false, scenarioCount: 1, scenarioAttempted: 0, scenarioCorrectOnLatest: 0 })
+  assert.deepEqual(evidenceBefore, { lessonCompleted: false, scenarioCount: 2, scenarioAttempted: 0, scenarioCorrectOnLatest: 0 })
   const result = recordScenarioAnswer({}, scenario.id, scenario.correctIndex, "2026-10-28T00:00:00Z")
   assert.deepEqual(getObjectiveEvidence(objective.id, progress, result), {
-    lessonCompleted: false, scenarioCount: 1, scenarioAttempted: 1, scenarioCorrectOnLatest: 1,
+    lessonCompleted: false, scenarioCount: 2, scenarioAttempted: 1, scenarioCorrectOnLatest: 1,
   })
   assert.equal(getObjectiveSummary({}, progress, result).objectivesPracticed, 1)
   const legacy = new Set([objective.moduleId])
@@ -41,4 +41,5 @@ test("confidence does not imply a completed lesson or a correct answer", () => {
   assert.equal(result.objectivesPracticed, 0)
   assert.equal(result.total, 63)
   assert.equal(result.objectivesWithScenarios, 63)
+  assert.equal(result.objectivesWithMultipleScenarios, 14)
 })

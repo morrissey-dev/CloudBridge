@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react"
 import { guidedLabs, evaluateLab, normalizeLabProgress, labProgressStorageKey, type LabProgress } from "../azureLabs"
 import { supplementalStorageObjectives } from "../az900Supplement"
+import { handsOnPaths, handsOnStorageKey, markHandsOnStep, normalizeHandsOnProgress, type HandsOnProgress, type HandsOnPath } from "../azureHandsOn"
 
 function restoreLabs(): LabProgress {
   try { const raw = window.localStorage.getItem(labProgressStorageKey); return raw ? normalizeLabProgress(JSON.parse(raw)) : {} }
+  catch { return {} }
+}
+
+function restoreHandsOn(): HandsOnProgress {
+  try { const raw = window.localStorage.getItem(handsOnStorageKey); return raw ? normalizeHandsOnProgress(JSON.parse(raw)) : {} }
   catch { return {} }
 }
 
@@ -14,6 +20,8 @@ export default function AzureLabsView({ onStudyActivity }: { onStudyActivity: ()
   const [checked, setChecked] = useState(false)
   const [saved, setSaved] = useState<LabProgress>(restoreLabs)
   const [storageWarning, setStorageWarning] = useState("")
+  const [handsOnProgress, setHandsOnProgress] = useState<HandsOnProgress>(restoreHandsOn)
+  const [handsOnWarning, setHandsOnWarning] = useState("")
   const lab = guidedLabs.find((item) => item.id === labId)!
   const step = lab.steps[stepIndex]
   const currentChoice = choices[stepIndex] ?? null
@@ -48,10 +56,22 @@ export default function AzureLabsView({ onStudyActivity }: { onStudyActivity: ()
     setChecked(false)
   }
 
+  function updateHandsOn(pathId: HandsOnPath["id"], stepId: string, checked: boolean) {
+    const next = markHandsOnStep(handsOnProgress, pathId, stepId, checked, new Date().toISOString())
+    try {
+      window.localStorage.setItem(handsOnStorageKey, JSON.stringify(next))
+      setHandsOnWarning("")
+    } catch {
+      setHandsOnWarning("Hands-on checklist changes could not be saved on this device. No Azure account data was accessed.")
+    }
+    setHandsOnProgress(next)
+    if (checked) onStudyActivity()
+  }
+
   return (
     <section className="labs-view" aria-label="Guided Azure learning labs">
       <div className="view-intro">
-        <div className="eyebrow">CloudBridge V1.5 · Guided decisions</div>
+        <div className="eyebrow">CloudBridge V1.6 · Guided decisions</div>
         <h1 className="view-title">Azure practice labs</h1>
         <p>Apply your Azure notes to storage and networking decisions in short, step-by-step simulations. Your earlier course and exam progress is unaffected.</p>
         <p className="scenario-source-note"><strong>Simulation only:</strong> no connection to an Azure subscription, no resource deployment, and no official Microsoft exam score. These activities provide practice evidence, not proof of hands-on configuration.</p>
@@ -98,6 +118,35 @@ export default function AzureLabsView({ onStudyActivity }: { onStudyActivity: ()
           <p>The networking exercise supports objective LO-051 conceptually. You still need a genuine Azure sandbox or supervised lab for hands-on configuration evidence.</p>
         </aside>}
       </div>
+      <section className="hands-on-section" aria-label="Optional hands-on Azure learning paths">
+        <div className="view-intro">
+          <h2>Optional official hands-on practice</h2>
+          <p>Explore Microsoft resources outside CloudBridge. These links are optional; first try the simulations if you do not have an Azure subscription or a learning budget.</p>
+          <p className="scenario-source-note"><strong>Self-reported checklist:</strong> ticking a step says only that you completed it. CloudBridge cannot see Azure resources or verify configuration, and it does not ask for credentials, subscription IDs or screenshots.</p>
+        </div>
+        <div className="hands-on-grid">
+          {handsOnPaths.map((path) => {
+            const count = handsOnProgress[path.id]?.completedStepIds.length ?? 0
+            return <article key={path.id} className="lab-panel hands-on-card">
+              <p className="eyebrow">{path.level}</p>
+              <h3>{path.title}</h3>
+              <p>{path.description}</p>
+              <p className="scenario-objective"><strong>Related objectives:</strong> {path.objectiveRefs.join(", ")}</p>
+              <p className="scenario-warning"><strong>Before you begin:</strong> {path.warning}</p>
+              <a href={path.officialUrl} target="_blank" rel="noopener noreferrer" className="hands-on-official-link">Open the official Microsoft learning resource ↗</a>
+              <fieldset className="hands-on-checklist">
+                <legend>My own checklist · {count} of {path.steps.length} self-reported</legend>
+                {path.steps.map((step) => <label key={step.id}>
+                  <input type="checkbox" checked={handsOnProgress[path.id]?.completedStepIds.includes(step.id) ?? false}
+                    onChange={(event) => updateHandsOn(path.id, step.id, event.target.checked)} />
+                  <span>{step.label}</span>
+                </label>)}
+              </fieldset>
+            </article>
+          })}
+        </div>
+        {handsOnWarning && <p role="alert" className="scenario-warning">{handsOnWarning}</p>}
+      </section>
     </section>
   )
 }

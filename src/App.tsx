@@ -42,7 +42,7 @@ import ModuleCard from "./components/ModuleCard"
 import ScenarioPracticeView from "./components/ScenarioPracticeView"
 import ObjectivesTrackerView from "./components/ObjectivesTrackerView"
 import AzureLabsView from "./components/AzureLabsView"
-import { currentQuestionAudit } from "./questionQuality"
+import { currentQuestionAudit, summarizeExamReviewStatus } from "./questionQuality"
 
 type View =
 
@@ -1501,6 +1501,7 @@ function QuizView({
               <div className="module-card-number">0{examIndex + 1}</div>
               <div className="module-card-icon"><Icon name="quiz" size={24} /></div>
               <div className="module-card-meta">{practiceExamPools[examIndex].length} questions · Mixed difficulty</div>
+              <p className="exam-verification-note">{summarizeExamReviewStatus(practiceExamPools[examIndex]).flaggedForVerification} flagged for verification · {summarizeExamReviewStatus(practiceExamPools[examIndex]).notesReviewed} notes-reviewed · {summarizeExamReviewStatus(practiceExamPools[examIndex]).unclassified} not reviewed.</p>
               <div className="module-card-title">{item.title}</div>
               <p>{item.subtitle}</p>
               <button className="primary-button" onClick={() => startExam(item.id)}>
@@ -1560,6 +1561,7 @@ function QuizView({
           <div className="eyebrow">{exam.title} complete</div>
           <div className="result-title">{score} out of {attempt.length}</div>
           <p>{percentage}% correct · CloudBridge practice percentage (not Microsoft's scaled exam score). Unanswered questions count as incorrect.</p>
+          <p className="exam-verification-note">This specific attempt includes {summarizeExamReviewStatus(attempt.map((item) => item.question)).flaggedForVerification} flagged questions, {summarizeExamReviewStatus(attempt.map((item) => item.question)).notesReviewed} questions checked against the supplied notes, and {summarizeExamReviewStatus(attempt.map((item) => item.question)).unclassified} questions with no review classification. None is certified as an official Microsoft question.</p>
           <div className="result-category-grid">
             {examCategories.map((category) => {
               const categoryQuestions = attempt.filter((item) => item.question.category === category)

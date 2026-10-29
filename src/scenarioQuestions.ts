@@ -2,6 +2,7 @@ import type { AZ900Category } from "./az900Exam.ts"
 import { sourceLearningObjectives } from "./learningObjectives.ts"
 import { scenarioQuestionsV14 } from "./scenarioQuestionsV14.ts"
 import { scenarioQuestionsV15 } from "./scenarioQuestionsV15.ts"
+import { scenarioQuestionsV16 } from "./scenarioQuestionsV16.ts"
 
 /** Original scenarios written for CloudBridge using the user's supplied Azure
  * Fundamentals notes and learning-objective list. Not official Microsoft questions.
@@ -143,6 +144,7 @@ export const scenarioQuestions: readonly ScenarioQuestion[] = [
   },
   ...scenarioQuestionsV14,
   ...scenarioQuestionsV15,
+  ...scenarioQuestionsV16,
 ]
 
 export function validateScenarioBank(): string[] {

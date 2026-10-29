@@ -33,3 +33,15 @@ export function auditQuestionBank(questions: readonly AZ900Question[]) {
 }
 
 export const currentQuestionAudit = auditQuestionBank(az900ExamQuestions)
+
+
+/** Review coverage for a *specific* exam; never describes notes-reviewed items as officially verified. */
+export function summarizeExamReviewStatus(questions: readonly AZ900Question[]) {
+  return {
+    total: questions.length,
+    flaggedForVerification: questions.filter((item) => item.verificationStatus === "needs-verification").length,
+    notesReviewed: questions.filter((item) => item.verificationStatus === "notes-reviewed").length,
+    unclassified: questions.filter((item) => !item.verificationStatus).length,
+    independentlyVerified: 0, // no independently verified status is defined for this authored bank
+  }
+}

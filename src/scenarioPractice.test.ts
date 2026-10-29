@@ -5,10 +5,10 @@ import {
   getScenarioOverview, normalizeScenarioProgress, recordScenarioAnswer,
 } from "./scenarioProgress.ts"
 
-test("all 63 scenarios have unique valid options and known objectives", () => {
-  assert.equal(scenarioQuestions.length, 63)
+test("all V1.6 scenarios have unique valid options and known objectives", () => {
+  assert.equal(scenarioQuestions.length, 77)
   assert.deepEqual(validateScenarioBank(), [])
-  assert.equal(new Set(scenarioQuestions.map((item) => item.id)).size, 63)
+  assert.equal(new Set(scenarioQuestions.map((item) => item.id)).size, scenarioQuestions.length)
 })
 
 test("scenario domain categorisation respects governance for cost optimisation", () => {
@@ -31,7 +31,7 @@ test("correct and incorrect answers record an independent attempt", () => {
   const b = recordScenarioAnswer(a, example.id, example.correctIndex, "2026-10-27T19:01:00.000Z")
   assert.equal(b[example.id].correct, true)
   assert.equal(b[example.id].attempts, 2)
-  assert.deepEqual(getScenarioOverview(b), { attempted: 1, latestCorrect: 1, total: 63 })
+  assert.deepEqual(getScenarioOverview(b), { attempted: 1, latestCorrect: 1, total: scenarioQuestions.length })
 })
 
 test("rejects invalid input and unsupported scenario IDs", () => {
@@ -50,4 +50,15 @@ test("stored answers validate shape and actual correctness", () => {
   assert.deepEqual(normalized, valid)
   assert.deepEqual(normalizeScenarioProgress({ [example.id]: { ...valid[example.id], correct: false } }), {})
   assert.deepEqual(normalizeScenarioProgress("hello"), {})
+})
+
+
+test("second-scenario practice deepens 14 objectives without renaming older saved items", () => {
+  const newScenarios = scenarioQuestions.filter((item) => item.id.startsWith("scenario-v16-"))
+  assert.equal(newScenarios.length, 14)
+  assert.equal(new Set(newScenarios.map((item) => item.objectiveId)).size, 14)
+  assert.equal(scenarioQuestions.filter((item) => !item.id.startsWith("scenario-v16-")).length, 63)
+  for (const item of newScenarios) {
+    assert.ok(scenarioQuestions.some((earlier) => earlier.objectiveId === item.objectiveId && earlier.id !== item.id))
+  }
 })

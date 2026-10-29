@@ -1,3 +1,4 @@
+import { handsOnStorageKey, isValidHandsOnProgress } from "./azureHandsOn.ts"
 /** Offline-only progress backup. Never includes arbitrary localStorage keys. */
 export const progressBackupKeys = [
   "cloudbridge_welcome_completed",
@@ -7,6 +8,7 @@ export const progressBackupKeys = [
   "cloudbridge-learning-progress-v1",
   "cloudbridge-scenario-practice-v1",
   "cloudbridge-lab-progress-v1",
+  "cloudbridge-hands-on-self-reported-v1",
   "cloudbridge-objective-confidence-v1",
   "cloudbridge-study-plan-v1",
   "cloudbridge-plan-date",
@@ -56,6 +58,12 @@ export function parseProgressBackup(text: string): ProgressBackup {
     }
     if (key === "cloudbridge_welcome_completed") {
       if (saved !== "true" && saved !== "false") throw new Error("Invalid welcome setting in backup.")
+    } else if (key === handsOnStorageKey) {
+      let parsed: unknown
+      try { parsed = JSON.parse(saved) } catch { throw new Error("Invalid self-reported hands-on progress.") }
+      if (!isValidHandsOnProgress(parsed)) {
+        throw new Error("Invalid self-reported hands-on progress.")
+      }
     } else if (key.startsWith("cloudbridge-plan-") && !key.startsWith("cloudbridge-plan-legacy")) {
       if (saved.length > 150) throw new Error("Invalid study-plan setting in backup.")
     } else {

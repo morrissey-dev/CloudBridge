@@ -110,7 +110,7 @@ export default function ObjectivesTrackerView({
   return (
     <section className="objective-hub" aria-labelledby="objective-hub-title">
       <div className="view-intro">
-        <div className="eyebrow">CloudBridge V1.5 · Your learning roadmap</div>
+        <div className="eyebrow">CloudBridge V1.6 · Your learning roadmap</div>
         <h1 id="objective-hub-title" className="view-title">Learning objectives</h1>
         <p>Track the 63 distinct objectives from your study materials, see which lessons you have completed, and identify the objectives with practical-scenario evidence.</p>
         <p className="scenario-source-note"><strong>Important:</strong> “Confident” is your personal reflection. One correct scenario answer is evidence of practice, not a verified mastery score or a predicted Microsoft exam result.</p>
@@ -119,6 +119,7 @@ export default function ObjectivesTrackerView({
         <div><strong>{summary.lessonsCompleted}/{summary.total}</strong><span>Objectives with linked lesson completed</span></div>
         <div><strong>{summary.objectivesPracticed}/{summary.objectivesWithScenarios}</strong><span>Objectives with scenario practice attempted</span></div>
         <div><strong>{summary.selfReportedConfident}/{summary.total}</strong><span>Marked confident by you</span></div>
+        <div><strong>{summary.objectivesWithMultipleScenarios}/{summary.total}</strong><span>Objectives with 2+ different scenarios available</span></div>
       </div>
       <div className="objective-tools">
         <label>Learning module
@@ -151,6 +152,7 @@ export default function ObjectivesTrackerView({
             <div className="objective-evidence">
               <span>{evidence.lessonCompleted ? "✓ Linked lesson completed" : "Linked lesson not completed"}</span>
               <span>{evidence.scenarioCount ? `Scenario practice: ${evidence.scenarioAttempted}/${evidence.scenarioCount} attempted, ${evidence.scenarioCorrectOnLatest} latest correct` : "No scenario question yet"}</span>
+              {evidence.scenarioCount > 1 && <span>{evidence.scenarioCount} distinct scenario questions available for deeper practice</span>}
               {objective.kind === "guided-practice" && <span>Hands-on exercise needed</span>}
             </div>
             <div className="objective-item-actions">

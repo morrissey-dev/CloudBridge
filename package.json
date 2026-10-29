@@ -1,13 +1,14 @@
 {
   "name": "cloudbridge",
   "private": true,
-  "version": "1.5.0",
+  "version": "1.6.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --experimental-strip-types --test src/assessment.test.ts src/learningProgress.test.ts src/learningStatistics.test.ts src/learningObjectives.test.ts src/scenarioPractice.test.ts src/objectiveTracker.test.ts src/progressBackup.test.ts src/questionQuality.test.ts src/scenarioFilters.test.ts src/azureLabs.test.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test src/assessment.test.ts src/learningProgress.test.ts src/learningStatistics.test.ts src/learningObjectives.test.ts src/scenarioPractice.test.ts src/objectiveTracker.test.ts src/progressBackup.test.ts src/questionQuality.test.ts src/scenarioFilters.test.ts src/azureLabs.test.ts src/azureHandsOn.test.ts",
     "format": "oxfmt"
   },
   "dependencies": {

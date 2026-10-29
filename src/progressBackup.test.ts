@@ -56,3 +56,21 @@ test("partial storage failures roll back changed entries where possible", () => 
   assert.equal(destination.getItem("cloudbridge-enrolled-v1"), "[0]")
   assert.equal(destination.getItem("cloudbridge-started-v1"), null)
 })
+
+
+test("hands-on self-reported progress is included safely in backups", () => {
+  const storage = new MemoryStorage()
+  const key = "cloudbridge-hands-on-self-reported-v1"
+  storage.setItem(key, JSON.stringify({
+    "cost-estimate": { completedStepIds: ["select"], updatedAt: "2026-10-28T09:00:00.000Z" },
+  }))
+  const backup = parseProgressBackup(exportProgressBackup(storage))
+  const restored = new MemoryStorage()
+  importProgressBackup(restored, backup)
+  assert.equal(restored.getItem(key), storage.getItem(key))
+  const unsafe = JSON.parse(exportProgressBackup(storage))
+  unsafe.data[key] = JSON.stringify({
+    "cost-estimate": { completedStepIds: ["select"], updatedAt: "2026-10-28T09:00:00.000Z", accessToken: "secret" },
+  })
+  assert.throws(() => parseProgressBackup(JSON.stringify(unsafe)), /Invalid self-reported/)
+})

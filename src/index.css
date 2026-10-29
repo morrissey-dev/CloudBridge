@@ -3504,7 +3504,7 @@ footer {
 /* V1.3 — objective tracker and browser-only progress backup */
 .objective-hub { max-width: 1160px; margin-inline: auto; }
 .objective-hub .view-title { margin: 0 0 8px; }
-.objective-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 20px 0; }
+.objective-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 20px 0; }
 .objective-summary > div { background: var(--surface); border: 1px solid var(--line); border-radius: 13px; padding: 20px; display: flex; flex-direction: column; gap: 7px; }
 .objective-summary strong { font-size: 1.55rem; color: var(--blue); }
 .objective-summary span { font-size: .92rem; color: var(--muted); line-height: 1.45; }
@@ -3565,3 +3565,15 @@ footer {
 .lab-objectives li { margin: 16px 0; line-height: 1.55; }
 .lab-objectives li p { color: var(--muted); margin: 5px 0; }
 @media (max-width: 860px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+
+/* CloudBridge V1.6 — optional official learning paths */
+.hands-on-section { margin-top: 2rem; }
+.hands-on-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr)); }
+.hands-on-card { min-width: 0; }
+.hands-on-official-link { display: inline-block; margin: 0.5rem 0 1.1rem; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.hands-on-official-link:focus-visible { outline: 3px solid currentColor; outline-offset: 4px; border-radius: 3px; }
+.hands-on-checklist { border: 0; margin: 0; padding: 0; }
+.hands-on-checklist legend { font-weight: 700; margin-bottom: 0.7rem; }
+.hands-on-checklist label { display: flex; align-items: flex-start; gap: 0.65rem; margin-bottom: 0.8rem; cursor: pointer; font-size: 0.95rem; line-height: 1.55; }
+.hands-on-checklist input { flex: 0 0 auto; width: 1.1rem; height: 1.1rem; margin-top: 0.2rem; }

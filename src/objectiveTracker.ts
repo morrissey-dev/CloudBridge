@@ -69,11 +69,13 @@ export function getObjectiveSummary(
   let scenarioAttempted = 0
   let scenarioCorrectOnLatest = 0
   let withPractice = 0
+  let withMultipleQuestions = 0
   for (const objective of sourceLearningObjectives) {
     const evidence = getObjectiveEvidence(objective.id, learningProgress, scenarioProgress, legacyCompletedModuleIds)
     if (evidence.lessonCompleted) lessonsCompleted += 1
     if (evidence.scenarioAttempted > 0) scenarioAttempted += 1
     if (evidence.scenarioCount > 0) withPractice += 1
+    if (evidence.scenarioCount > 1) withMultipleQuestions += 1
     if (evidence.scenarioCount > 0 && evidence.scenarioCorrectOnLatest === evidence.scenarioCount) {
       scenarioCorrectOnLatest += 1
     }
@@ -83,6 +85,7 @@ export function getObjectiveSummary(
     selfReportedConfident: sourceLearningObjectives.filter((objective) => confidence[objective.id] === "confident").length,
     lessonsCompleted,
     objectivesWithScenarios: withPractice,
+    objectivesWithMultipleScenarios: withMultipleQuestions,
     objectivesPracticed: scenarioAttempted,
     objectivesCorrectOnLatest: scenarioCorrectOnLatest,
   }
