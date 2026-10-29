@@ -1,5 +1,6 @@
 import type { AZ900Category } from "./az900Exam.ts"
 import { sourceLearningObjectives } from "./learningObjectives.ts"
+import { scenarioQuestionsV14 } from "./scenarioQuestionsV14.ts"
 
 /** Original scenarios written for CloudBridge using the user's supplied Azure
  * Fundamentals notes and learning-objective list. Not official Microsoft questions.
@@ -139,6 +140,7 @@ export const scenarioQuestions: readonly ScenarioQuestion[] = [
     explanation: "Application Insights is part of Azure Monitor and helps collect and analyse application telemetry, including performance and request failures.",
     takeaway: "Use monitoring data to investigate performance rather than guessing at causes.",
   },
+  ...scenarioQuestionsV14,
 ]
 
 export function validateScenarioBank(): string[] {

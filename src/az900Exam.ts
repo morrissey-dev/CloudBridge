@@ -15,7 +15,8 @@ export type AZ900Question = {
   options: [string, string, string, string]
   correctAnswer: string
   explanation: string
-  verificationStatus?: "needs-verification"
+  verificationStatus?: "needs-verification" | "notes-reviewed"
+  reviewSource?: string
 }
 
 const originalAZ900ExamQuestions: AZ900Question[] = [

@@ -2,6 +2,9 @@ import { az900ExamQuestions, type AZ900Question } from "./az900Exam.ts"
 
 /** Structural checks are not factual review against Microsoft documentation. */
 export function auditQuestionBank(questions: readonly AZ900Question[]) {
+  const notesReviewed = questions.filter((item) => item.verificationStatus === "notes-reviewed").length
+  const unclassified = questions.filter((item) => !item.verificationStatus).length
+  const missingReviewSources = questions.filter((item) => item.verificationStatus === "notes-reviewed" && !item.reviewSource?.trim()).map((item) => item.id)
   const flaggedForVerification = questions.filter((item) => item.verificationStatus === "needs-verification").length
   const missingExplanations = questions.filter((item) => !item.explanation.trim()).map((item) => item.id)
   const invalidAnswers = questions.filter((item) =>
@@ -18,7 +21,10 @@ export function auditQuestionBank(questions: readonly AZ900Question[]) {
   return {
     total: questions.length,
     flaggedForVerification,
-    notFlaggedButNotIndependentlyVerified: questions.length - flaggedForVerification,
+    notesReviewed,
+    unclassified,
+    missingReviewSources,
+    notFlaggedButNotIndependentlyVerified: unclassified,
     missingExplanations,
     invalidAnswers,
     duplicateIds,

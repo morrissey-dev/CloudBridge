@@ -6,7 +6,10 @@ import { auditQuestionBank } from "./questionQuality.ts"
 test("question bank audit exposes verification pending without calling unflagged questions verified", () => {
   const audit = auditQuestionBank(az900ExamQuestions)
   assert.equal(audit.total, 264)
-  assert.equal(audit.flaggedForVerification, 224)
+  assert.equal(audit.flaggedForVerification, 206)
+  assert.equal(audit.notesReviewed, 18)
+  assert.equal(audit.unclassified, 40)
+  assert.deepEqual(audit.missingReviewSources, [])
   assert.equal(audit.notFlaggedButNotIndependentlyVerified, 40)
   assert.deepEqual(audit.invalidAnswers, [])
   assert.deepEqual(audit.missingExplanations, [])

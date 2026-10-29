@@ -1,7 +1,8 @@
 import type { AZ900Question } from "./az900Exam.ts"
 
 /** Additional original, notes-based governance study questions.
- * They retain a needs-verification flag until independently reviewed.
+ * Each question was compared with the supplied Azure notes in V1.4;
+ * independent review against current Microsoft Learn product documentation is still needed.
  */
 export const sourceGovernanceQuestions: AZ900Question[] = [
   {
@@ -18,7 +19,8 @@ export const sourceGovernanceQuestions: AZ900Question[] = [
     ],
     "correctAnswer": "Azure regions may have different service pricing",
     "explanation": "Azure resource pricing can vary by region because costs and charges differ geographically; compare region-specific estimates.",
-    "verificationStatus": "needs-verification"
+    "verificationStatus": "notes-reviewed",
+    "reviewSource": "Microsoft Azure.docx — Azure cost management / governance / deployment / monitoring sections"
   },
   {
     "id": "added-gov-source-002",
@@ -34,7 +36,8 @@ export const sourceGovernanceQuestions: AZ900Question[] = [
     ],
     "correctAnswer": "Outbound data transfer or bandwidth charges",
     "explanation": "Outbound data transfer may incur bandwidth charges depending on the zones and services involved.",
-    "verificationStatus": "needs-verification"
+    "verificationStatus": "notes-reviewed",
+    "reviewSource": "Microsoft Azure.docx — Azure cost management / governance / deployment / monitoring sections"
   },
   {
     "id": "added-gov-source-003",
@@ -50,7 +53,8 @@ export const sourceGovernanceQuestions: AZ900Question[] = [
     ],
     "correctAnswer": "Azure Reservations",
     "explanation": "Azure Reservations can reduce eligible charges for predictable resource usage with one- or three-year commitments.",
-    "verificationStatus": "needs-verification"
+    "verificationStatus": "notes-reviewed",
+    "reviewSource": "Microsoft Azure.docx — Azure cost management / governance / deployment / monitoring sections"
   },
   {
     "id": "added-gov-source-004",
@@ -66,7 +70,8 @@ export const sourceGovernanceQuestions: AZ900Question[] = [
     ],
     "correctAnswer": "An Azure savings plan for compute",
     "explanation": "Savings plans for compute are based on a committed hourly spend across eligible compute usage.",
-    "verificationStatus": "needs-verification"
+    "verificationStatus": "notes-reviewed",
+    "reviewSource": "Microsoft Azure.docx — Azure cost management / governance / deployment / monitoring sections"
   },
   {
     "id": "added-gov-source-005",
@@ -82,7 +87,8 @@ export const sourceGovernanceQuestions: AZ900Question[] = [
     ],
     "correctAnswer": "Azure Spot Virtual Machines",
     "explanation": "Spot VMs use spare Azure capacity at lower prices but can be evicted, so they are suited to interruptible jobs.",
-    "verificationStatus": "needs-verification"
+    "verificationStatus": "notes-reviewed",
+    "reviewSource": "Microsoft Azure.docx — Azure cost management / governance / deployment / monitoring sections"
   },
   {
     "id": "added-gov-source-006",
@@ -98,7 +104,8 @@ export const sourceGovernanceQuestions: AZ900Question[] = [
     ],
     "correctAnswer": "An estimated cost is generated without deploying those resources",
     "explanation": "The Pricing Calculator estimates costs; adding resources there does not provision them or create charges.",
-    "verificationStatus": "needs-verification"
+    "verificationStatus": "notes-reviewed",
+    "reviewSource": "Microsoft Azure.docx — Azure cost management / governance / deployment / monitoring sections"
   },
   {
     "id": "added-gov-source-007",
@@ -114,7 +121,8 @@ export const sourceGovernanceQuestions: AZ900Question[] = [
     ],
     "correctAnswer": "An alert is generated for configured recipients",
     "explanation": "Budget thresholds can trigger alerts. Automated shutdown or changes require additional configuration.",
-    "verificationStatus": "needs-verification"
+    "verificationStatus": "notes-reviewed",
+    "reviewSource": "Microsoft Azure.docx — Azure cost management / governance / deployment / monitoring sections"
   },
   {
     "id": "added-gov-source-008",
@@ -130,7 +138,8 @@ export const sourceGovernanceQuestions: AZ900Question[] = [
     ],
     "correctAnswer": "Add CostCenter and Department resource tags",
     "explanation": "Tags are key-value metadata used for categorization, cost allocation, operations, and governance.",
-    "verificationStatus": "needs-verification"
+    "verificationStatus": "notes-reviewed",
+    "reviewSource": "Microsoft Azure.docx — Azure cost management / governance / deployment / monitoring sections"
   },
   {
     "id": "added-gov-source-009",
@@ -146,7 +155,8 @@ export const sourceGovernanceQuestions: AZ900Question[] = [
     ],
     "correctAnswer": "Azure Policy",
     "explanation": "Azure Policy evaluates resource configuration and can restrict non-compliant deployments based on policy definitions.",
-    "verificationStatus": "needs-verification"
+    "verificationStatus": "notes-reviewed",
+    "reviewSource": "Microsoft Azure.docx — Azure cost management / governance / deployment / monitoring sections"
   },
   {
     "id": "added-gov-source-010",
@@ -162,7 +172,8 @@ export const sourceGovernanceQuestions: AZ900Question[] = [
     ],
     "correctAnswer": "An Azure Policy initiative",
     "explanation": "An Azure Policy initiative groups policy definitions to manage broader compliance objectives.",
-    "verificationStatus": "needs-verification"
+    "verificationStatus": "notes-reviewed",
+    "reviewSource": "Microsoft Azure.docx — Azure cost management / governance / deployment / monitoring sections"
   },
   {
     "id": "added-gov-source-011",
@@ -178,7 +189,8 @@ export const sourceGovernanceQuestions: AZ900Question[] = [
     ],
     "correctAnswer": "Delete lock",
     "explanation": "A Delete lock prevents deletion but permits other allowed changes; ReadOnly also prevents updates.",
-    "verificationStatus": "needs-verification"
+    "verificationStatus": "notes-reviewed",
+    "reviewSource": "Microsoft Azure.docx — Azure cost management / governance / deployment / monitoring sections"
   },
   {
     "id": "added-gov-source-012",
@@ -194,7 +206,8 @@ export const sourceGovernanceQuestions: AZ900Question[] = [
     ],
     "correctAnswer": "Microsoft Service Trust Portal",
     "explanation": "The Service Trust Portal provides access to Microsoft security, privacy, and compliance documentation.",
-    "verificationStatus": "needs-verification"
+    "verificationStatus": "notes-reviewed",
+    "reviewSource": "Microsoft Azure.docx — Azure cost management / governance / deployment / monitoring sections"
   },
   {
     "id": "added-gov-source-013",
@@ -210,7 +223,8 @@ export const sourceGovernanceQuestions: AZ900Question[] = [
     ],
     "correctAnswer": "Azure Cloud Shell",
     "explanation": "Azure Cloud Shell provides browser-based Azure CLI and PowerShell environments.",
-    "verificationStatus": "needs-verification"
+    "verificationStatus": "notes-reviewed",
+    "reviewSource": "Microsoft Azure.docx — Azure cost management / governance / deployment / monitoring sections"
   },
   {
     "id": "added-gov-source-014",
@@ -226,7 +240,8 @@ export const sourceGovernanceQuestions: AZ900Question[] = [
     ],
     "correctAnswer": "Azure Resource Manager",
     "explanation": "Azure Resource Manager is the management layer through which Azure resource deployment and management requests pass.",
-    "verificationStatus": "needs-verification"
+    "verificationStatus": "notes-reviewed",
+    "reviewSource": "Microsoft Azure.docx — Azure cost management / governance / deployment / monitoring sections"
   },
   {
     "id": "added-gov-source-015",
@@ -242,7 +257,8 @@ export const sourceGovernanceQuestions: AZ900Question[] = [
     ],
     "correctAnswer": "Bicep",
     "explanation": "Bicep is a declarative language for Azure resource deployment that compiles to Azure Resource Manager templates.",
-    "verificationStatus": "needs-verification"
+    "verificationStatus": "notes-reviewed",
+    "reviewSource": "Microsoft Azure.docx — Azure cost management / governance / deployment / monitoring sections"
   },
   {
     "id": "added-gov-source-016",
@@ -258,7 +274,8 @@ export const sourceGovernanceQuestions: AZ900Question[] = [
     ],
     "correctAnswer": "Azure Advisor",
     "explanation": "Azure Advisor analyses resources and offers best-practice recommendations including cost, performance, reliability, and security.",
-    "verificationStatus": "needs-verification"
+    "verificationStatus": "notes-reviewed",
+    "reviewSource": "Microsoft Azure.docx — Azure cost management / governance / deployment / monitoring sections"
   },
   {
     "id": "added-gov-source-017",
@@ -274,7 +291,8 @@ export const sourceGovernanceQuestions: AZ900Question[] = [
     ],
     "correctAnswer": "Azure Service Health",
     "explanation": "Azure Service Health provides personalized information about service incidents, planned maintenance, and advisories.",
-    "verificationStatus": "needs-verification"
+    "verificationStatus": "notes-reviewed",
+    "reviewSource": "Microsoft Azure.docx — Azure cost management / governance / deployment / monitoring sections"
   },
   {
     "id": "added-gov-source-018",
@@ -290,6 +308,7 @@ export const sourceGovernanceQuestions: AZ900Question[] = [
     ],
     "correctAnswer": "Application Insights",
     "explanation": "Application Insights is an application-performance monitoring capability within Azure Monitor.",
-    "verificationStatus": "needs-verification"
+    "verificationStatus": "notes-reviewed",
+    "reviewSource": "Microsoft Azure.docx — Azure cost management / governance / deployment / monitoring sections"
   }
 ]

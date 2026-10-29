@@ -1489,7 +1489,7 @@ function QuizView({
           <div className="eyebrow">Exam practice</div>
           <div className="view-title">Build confidence, one practice exam at a time.</div>
           <p>Each exam contains 45 non-overlapping questions: 13 cloud concepts, 18 architecture and services, and 14 management and governance. Question and answer order are randomized. Answers and explanations appear in your results review.</p>
-          <p className="exam-verification-note">{currentQuestionAudit.flaggedForVerification} of {currentQuestionAudit.total} questions are explicitly flagged for verification. The remaining {currentQuestionAudit.notFlaggedButNotIndependentlyVerified} are not independently certified or reviewed. These scores are for CloudBridge study practice, not a Microsoft exam-readiness prediction.</p>
+          <p className="exam-verification-note">{currentQuestionAudit.flaggedForVerification} of {currentQuestionAudit.total} questions are explicitly flagged for verification. {currentQuestionAudit.notesReviewed} have been checked against the supplied notes (not independently verified against current service documentation); {currentQuestionAudit.unclassified} have no review status. These scores are for CloudBridge study practice, not a Microsoft exam-readiness prediction.</p>
         </div>
         <div className="module-card-grid exam-choice-grid">
           {practiceExams.map((item, examIndex) => (
@@ -1598,6 +1598,9 @@ function QuizView({
                     Needs verification against official Microsoft Learn documentation.
                   </p>
                 )}
+                {item.verificationStatus === "notes-reviewed" && (
+                  <p className="exam-verification-note">Checked against supplied Azure notes; independent Microsoft documentation review remains pending.</p>
+                )}
               </div>
             </details>
           ))}
@@ -1621,6 +1624,9 @@ function QuizView({
             {question.objective} · {question.difficulty}
             {question.verificationStatus === "needs-verification" && (
               <strong className="verification-badge">Needs Microsoft Learn verification</strong>
+            )}
+            {question.verificationStatus === "notes-reviewed" && (
+              <strong className="verification-badge">Compared with supplied Azure notes</strong>
             )}
           </p>
           <div className="quiz-question">{question.question}</div>
@@ -2211,6 +2217,7 @@ function readBrowserLearningProgress(): {
 export default function App() {
 
   const [view, setView] = useState<View>("Home")
+  const [scenarioObjectiveId, setScenarioObjectiveId] = useState<string | null>(null)
   const [welcomeCompleted, setWelcomeCompleted] = useState(hasCompletedWelcome)
   const [initialLearningProgress] = useState(readBrowserLearningProgress)
   const [learningProgress, setLearningProgress] = useState(initialLearningProgress.progress)
@@ -2318,6 +2325,7 @@ export default function App() {
 
   function navigate(nextView: View) {
 
+    if (nextView === "Scenario practice") setScenarioObjectiveId(null)
     setView(nextView)
 
     setNavOpen(false)
@@ -2541,14 +2549,14 @@ export default function App() {
 
           {view === "Case studies" && <CaseStudiesView />}
 
-          {view === "Scenario practice" && <ScenarioPracticeView onStudyActivity={recordStudyActivity} />}
+          {view === "Scenario practice" && <ScenarioPracticeView onStudyActivity={recordStudyActivity} initialObjectiveId={scenarioObjectiveId} />}
 
           {view === "Learning objectives" && (
             <ObjectivesTrackerView
               learningProgress={learningProgress}
               legacyCompletedModuleIds={legacyCompletedModuleIds}
               onBrowseModules={() => navigate("Modules")}
-              onOpenScenarios={() => navigate("Scenario practice")}
+              onOpenScenarios={(objectiveId) => { navigate("Scenario practice"); setScenarioObjectiveId(objectiveId) }}
             />
           )}
 

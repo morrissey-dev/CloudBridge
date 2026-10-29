@@ -86,7 +86,7 @@ test("question bank preserves the original questions and exceeds five exam pools
       .filter((question) => question.id.startsWith("added-"))
 
       .every(
-        (question) => question.verificationStatus === "needs-verification",
+        (question) => ["needs-verification", "notes-reviewed"].includes(question.verificationStatus ?? ""),
       ),
   )
 })

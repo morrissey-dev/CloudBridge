@@ -16,6 +16,13 @@ CloudBridge brings learning and revision tools together in one platform, helping
 
 
 
+## V1.4 additions
+
+- **36 objective-linked scenarios**, with topic filters, review of incorrect latest answers, and navigation from the objectives tracker.
+- **Source review transparency:** 18 existing governance exam questions compared with the learner-provided Azure notes; all unreviewed items remain marked accordingly. This is not Microsoft validation.
+- **Curriculum gap register** compares the learner's separate objective list with the official AZ-900 guide, including the Azure storage topics in the full notes.
+- **Compatibility:** preserved all existing localStorage keys and all original scenario IDs. See `docs/V1.4-RELEASE-NOTES.md` and `docs/HOW-TO-UPGRADE-V1.4.md`.
+
 ## Key Features
 
 

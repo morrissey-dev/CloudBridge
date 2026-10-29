@@ -3532,3 +3532,22 @@ footer {
 .objective-backup-message { color: var(--blue); }
 @media (max-width: 800px) { .objective-summary, .objective-tools { grid-template-columns: 1fr; } }
 @media (max-width: 540px) { .objective-item-title { flex-wrap: wrap; } .objective-item, .objective-backup { padding: 15px; } }
+
+/* V1.4: readable, keyboard-accessible practice filters */
+.scenario-filter-tools {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+  padding: 14px 18px; margin: 16px 0 20px;
+  border: 1px solid #e5dfd4; background: #fffdf9; border-radius: 12px;
+}
+.scenario-filter-tools label { font-size: .95rem; font-weight: 650; color: #243241; }
+.scenario-filter-tools select {
+  border: 1px solid #b8b9b9; border-radius: 9px; background: #fff; color: #243241;
+  font: inherit; min-height: 42px; padding: 8px 11px; max-width: 100%;
+}
+.scenario-filter-tools span { font-size: .9rem; color: #475569; }
+.scenario-filter-tools select:focus-visible { outline: 3px solid #3b82f6; outline-offset: 2px; }
+.scenario-empty { padding: 20px 0; }
+@media (max-width: 600px) {
+  .scenario-filter-tools { align-items: stretch; flex-direction: column; }
+  .scenario-filter-tools select { width: 100%; }
+}

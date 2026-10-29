@@ -1,0 +1,64 @@
+objectiveId,objective,module,linkedLesson,scenarioCount,scenarioIds,coverageStatus
+LO-001,Define cloud computing.,cloud-concepts,Cloud computing,1,scenario-cloud-05,Has single scenario (not mastery proof)
+LO-002,Describe the shared responsibility model.,cloud-concepts,Shared responsibility,1,scenario-cloud-01,Has single scenario (not mastery proof)
+LO-003,"Define cloud models, including public, private, and hybrid.",cloud-concepts,Public cloud,1,scenario-cloud-06,Has single scenario (not mastery proof)
+LO-004,Identify appropriate use cases for each cloud model.,cloud-concepts,Hybrid cloud,1,scenario-cloud-02,Has single scenario (not mastery proof)
+LO-005,Describe the consumption-based model.,cloud-concepts,Consumption-based model,1,scenario-cloud-04,Has single scenario (not mastery proof)
+LO-006,Compare cloud pricing models.,cloud-concepts,Reservations,1,scenario-cloud-07,Has single scenario (not mastery proof)
+LO-007,Describe the benefits of high availability and scalability in the cloud.,cloud-concepts,High availability,1,scenario-cloud-03,Has single scenario (not mastery proof)
+LO-008,Describe the benefits of reliability and predictability in the cloud.,cloud-concepts,Reliability,1,scenario-cloud-08,Has single scenario (not mastery proof)
+LO-009,Describe the benefits of security and governance in the cloud.,cloud-concepts,Security and governance,1,scenario-cloud-09,Has single scenario (not mastery proof)
+LO-010,Describe the benefits of manageability in the cloud.,cloud-concepts,Management of and in the cloud,1,scenario-cloud-10,Has single scenario (not mastery proof)
+LO-011,Describe sustainability considerations and benefits in the cloud.,cloud-concepts,Sustainability,1,scenario-cloud-11,Has single scenario (not mastery proof)
+LO-012,Describe factors that can affect costs in Azure.,cloud-concepts,Resource type and settings,0,,Not yet scenario-assessed
+LO-013,Describe the Azure Pricing calculator.,cloud-concepts,Azure Pricing Calculator,0,,Not yet scenario-assessed
+LO-014,Describe the Microsoft Cost Management Tool.,cloud-concepts,Microsoft Cost Management,0,,Not yet scenario-assessed
+LO-015,Describe the purpose of tags.,cloud-concepts,Resource tags,1,scenario-gov-01,Has single scenario (not mastery proof)
+LO-016,"Describe cost optimization options, including Reservations, savings plans, and Spot pricing.",cloud-concepts,Reservations,1,scenario-gov-13,Has single scenario (not mastery proof)
+LO-017,Describe the purpose of Microsoft Purview,governance-security,Microsoft Purview,1,scenario-gov-05,Has single scenario (not mastery proof)
+LO-018,Describe the purpose of Azure Policy,governance-security,Azure Policy,1,scenario-gov-02,Has single scenario (not mastery proof)
+LO-019,How does Azure Policy define policies?,governance-security,Azure Policy,0,,Not yet scenario-assessed
+LO-020,What are Azure Policy initiatives?,governance-security,Policy initiatives and guardrails,1,scenario-gov-06,Has single scenario (not mastery proof)
+LO-021,Describe the purpose of resource locks,governance-security,Resource locks,1,scenario-gov-03,Has single scenario (not mastery proof)
+LO-022,Describe the purpose of the Service Trust portal,governance-security,Service Trust Portal,1,scenario-gov-07,Has single scenario (not mastery proof)
+LO-023,Describe the Azure portal.,governance-security,Azure portal,0,,Not yet scenario-assessed
+LO-024,"Describe Azure Cloud Shell, including Azure CLI and Azure PowerShell.",governance-security,Azure Cloud Shell,1,scenario-gov-08,Has single scenario (not mastery proof)
+LO-025,Describe the purpose of Azure Arc.,governance-security,Azure Arc,1,scenario-gov-09,Has single scenario (not mastery proof)
+LO-026,"Describe Azure Resource Manager (ARM), ARM templates, and Bicep.",governance-security,ARM templates and Bicep,1,scenario-gov-10,Has single scenario (not mastery proof)
+LO-027,Describe the purpose of Azure Advisor.,governance-security,Azure Advisor,1,scenario-gov-11,Has single scenario (not mastery proof)
+LO-028,Describe Azure Service Health.,governance-security,"Azure Status, Service Health, and Resource Health",1,scenario-gov-12,Has single scenario (not mastery proof)
+LO-029,"Describe Azure Monitor, including Azure Log Analytics, Azure Monitor Alerts, and Application Insights.",governance-security,Azure Monitor,1,scenario-gov-04,Has single scenario (not mastery proof)
+LO-030,"Describe Azure regions, region pairs, and sovereign regions.",azure-architecture,Azure regions,1,scenario-arch-05,Has single scenario (not mastery proof)
+LO-031,Describe Availability Zones.,azure-architecture,Availability zones,1,scenario-arch-01,Has single scenario (not mastery proof)
+LO-032,Describe Azure datacenters.,azure-architecture,Azure datacenters,0,,Not yet scenario-assessed
+LO-033,Describe Azure resources and Resource Groups.,azure-architecture,Resource groups,1,scenario-arch-06,Has single scenario (not mastery proof)
+LO-034,Describe subscriptions.,azure-architecture,Azure subscriptions,0,,Not yet scenario-assessed
+LO-035,Describe management groups.,azure-architecture,Management groups,0,,Not yet scenario-assessed
+LO-036,"Describe the hierarchy of resource groups, subscriptions, and management groups.",azure-architecture,The Azure hierarchy,1,scenario-arch-07,Has single scenario (not mastery proof)
+LO-037,"Compare compute types, including container instances, virtual machines, and functions.",azure-services,Choosing a hosting option,1,scenario-arch-02,Has single scenario (not mastery proof)
+LO-038,"Describe virtual machine options, including virtual machines (VMs), virtual machine scale sets, and virtual machine availability sets.",azure-services,Availability Sets,1,scenario-arch-08,Has single scenario (not mastery proof)
+LO-039,Describe resources required for virtual machines.,azure-services,VM size families and resources,1,scenario-arch-09,Has single scenario (not mastery proof)
+LO-040,"Describe application hosting options, including Azure Web Apps, containers, and virtual machines.",azure-services,Azure App Service,1,scenario-arch-10,Has single scenario (not mastery proof)
+LO-041,"Describe AI, machine learning, and IoT/Edge service categories in Azure.",azure-services,Azure AI services and Azure OpenAI,0,,Not yet scenario-assessed
+LO-042,Recognize agentic AI as an application pattern built from Azure AI capabilities.,azure-services,Agentic AI pattern,0,,Not yet scenario-assessed
+LO-043,Describe Azure virtual networking,azure-services,Virtual networks and subnets,0,,Not yet scenario-assessed
+LO-044,Describe Azure virtual private networks,azure-services,VPN Gateway,0,,Not yet scenario-assessed
+LO-045,Describe Azure ExpressRoute,azure-services,Azure ExpressRoute,1,scenario-arch-11,Has single scenario (not mastery proof)
+LO-046,Describe Azure DNS,azure-services,Azure DNS,0,,Not yet scenario-assessed
+LO-047,"Describe Azure virtual networking, including subnets and endpoints.",azure-services,Virtual networks and subnets,1,scenario-arch-03,Has single scenario (not mastery proof)
+LO-048,Describe connectivity options with Azure VPN Gateway.,azure-services,VPN Gateway,0,,Not yet scenario-assessed
+LO-049,Describe when to use Azure ExpressRoute.,azure-services,Azure ExpressRoute,0,,Not yet scenario-assessed
+LO-050,Describe Azure DNS capabilities.,azure-services,Azure DNS,1,scenario-arch-12,Has single scenario (not mastery proof)
+LO-051,Configure basic network access for an Azure resource.,azure-services,VNet peering and basic access,0,,Not yet scenario-assessed
+LO-052,Describe Azure directory services,governance-security,Microsoft Entra ID,0,,Not yet scenario-assessed
+LO-053,What does Microsoft Entra ID do?,governance-security,Microsoft Entra ID,0,,Not yet scenario-assessed
+LO-054,What is Microsoft Entra Domain Services?,governance-security,Microsoft Entra Domain Services,0,,Not yet scenario-assessed
+LO-055,How does Microsoft Entra Domain Services work?,governance-security,Microsoft Entra Domain Services,0,,Not yet scenario-assessed
+LO-056,Describe Azure authentication methods,governance-security,Multifactor Authentication,0,,Not yet scenario-assessed
+LO-057,Describe Azure external identities,governance-security,External identities,0,,Not yet scenario-assessed
+LO-058,Describe Azure conditional access,governance-security,Conditional Access,0,,Not yet scenario-assessed
+LO-059,Describe Azure role-based access control,governance-security,Azure RBAC,1,scenario-arch-04,Has single scenario (not mastery proof)
+LO-060,Describe Zero Trust model,governance-security,Zero Trust,0,,Not yet scenario-assessed
+LO-061,Describe defense-in-depth,governance-security,Defense in depth,0,,Not yet scenario-assessed
+LO-062,Describe encryption and key management in Azure,governance-security,Azure Key Vault,0,,Not yet scenario-assessed
+LO-063,Describe Microsoft Defender for Cloud,governance-security,Microsoft Defender for Cloud,0,,Not yet scenario-assessed
