@@ -1,13 +1,13 @@
 {
   "name": "cloudbridge",
   "private": true,
-  "version": "1.2.0",
+  "version": "1.3.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --experimental-strip-types --test src/assessment.test.ts src/learningProgress.test.ts src/learningStatistics.test.ts src/learningObjectives.test.ts src/scenarioPractice.test.ts",
+    "test": "node --experimental-strip-types --test src/assessment.test.ts src/learningProgress.test.ts src/learningStatistics.test.ts src/learningObjectives.test.ts src/scenarioPractice.test.ts src/objectiveTracker.test.ts src/progressBackup.test.ts src/questionQuality.test.ts",
     "format": "oxfmt"
   },
   "dependencies": {

@@ -40,6 +40,8 @@ import { getObjectivesForModule } from "./learningObjectives"
 import Icon, { type IconName } from "./components/Icon"
 import ModuleCard from "./components/ModuleCard"
 import ScenarioPracticeView from "./components/ScenarioPracticeView"
+import ObjectivesTrackerView from "./components/ObjectivesTrackerView"
+import { currentQuestionAudit } from "./questionQuality"
 
 type View =
 
@@ -56,6 +58,8 @@ type View =
   | "Case studies"
 
   | "Scenario practice"
+
+  | "Learning objectives"
 
   | "Study plan"
 
@@ -74,6 +78,8 @@ const navItems: { label: View; icon: IconName }[] = [
   { label: "Case studies", icon: "target" },
 
   { label: "Scenario practice", icon: "quiz" },
+
+  { label: "Learning objectives", icon: "target" },
 
   { label: "Study plan", icon: "calendar" },
 
@@ -1483,7 +1489,7 @@ function QuizView({
           <div className="eyebrow">Exam practice</div>
           <div className="view-title">Build confidence, one practice exam at a time.</div>
           <p>Each exam contains 45 non-overlapping questions: 13 cloud concepts, 18 architecture and services, and 14 management and governance. Question and answer order are randomized. Answers and explanations appear in your results review.</p>
-          <p className="exam-verification-note">Questions marked “Needs Microsoft Learn verification” are new original study questions pending documentation review.</p>
+          <p className="exam-verification-note">{currentQuestionAudit.flaggedForVerification} of {currentQuestionAudit.total} questions are explicitly flagged for verification. The remaining {currentQuestionAudit.notFlaggedButNotIndependentlyVerified} are not independently certified or reviewed. These scores are for CloudBridge study practice, not a Microsoft exam-readiness prediction.</p>
         </div>
         <div className="module-card-grid exam-choice-grid">
           {practiceExams.map((item, examIndex) => (
@@ -2536,6 +2542,15 @@ export default function App() {
           {view === "Case studies" && <CaseStudiesView />}
 
           {view === "Scenario practice" && <ScenarioPracticeView onStudyActivity={recordStudyActivity} />}
+
+          {view === "Learning objectives" && (
+            <ObjectivesTrackerView
+              learningProgress={learningProgress}
+              legacyCompletedModuleIds={legacyCompletedModuleIds}
+              onBrowseModules={() => navigate("Modules")}
+              onOpenScenarios={() => navigate("Scenario practice")}
+            />
+          )}
 
           {view === "Study plan" && <StudyPlanView />}
 

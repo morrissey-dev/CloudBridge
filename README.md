@@ -159,3 +159,14 @@ CloudBridge is a learning project intended to support Azure Fundamentals prepara
 
 See [`docs/HOW-TO-UPGRADE-V1.2.md`](docs/HOW-TO-UPGRADE-V1.2.md).
 Use the incremental patch on a clean v1.1 working tree, not by overwriting your existing folder with this archive.
+
+## Version 1.3 — Objective progress and learner backups
+
+- Added a searchable **Learning objectives** screen covering all 63 distinct objectives from the uploaded study-outcomes document.
+- Separated learner self-confidence from objective-linked lesson completion and scenario performance; these signals do not assert examination readiness.
+- Added private, browser-based progress backup and restore for CloudBridge data only, with import confirmation.
+- Added dynamic question-bank review counts: 224 of 264 questions explicitly require verification; the remaining 40 are not independently certified or reviewed.
+- Existing V1.2 saved progress keys and scenario-answer schema remain unchanged.
+- Expanded automated tests to 41 passing cases; TypeScript check passed. Production Vite build still needs a clean local dependency install to verify.
+
+See `docs/V1.3-RELEASE-NOTES.md` and `docs/HOW-TO-UPGRADE-V1.3.md` for details.
