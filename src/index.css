@@ -3464,3 +3464,38 @@ footer {
 .lesson-objectives strong { font-size: .88rem; }
 .lesson-objectives ul { margin: .4rem 0 0; padding-left: 1.1rem; }
 .lesson-objectives li { font-size: .9rem; line-height: 1.55; padding: .08rem 0; }
+
+/* V1.2 objective-linked scenario practice: additive styles, no existing selectors overridden. */
+.scenario-view { max-width: 1160px; margin-inline: auto; }
+.scenario-source-note { font-size: .9rem; color: #6b5c45; }
+.scenario-summary { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin: 18px 0 24px; }
+.scenario-summary > div { padding: 17px; border: 1px solid #e6e1d8; background: #fffdf8; border-radius: 13px; display: flex; flex-direction: column; gap: 5px; }
+.scenario-summary strong { font-size: 1.35rem; font-weight: 750; color: #202833; }
+.scenario-summary span { font-size: .85rem; color: #5f6770; }
+.scenario-layout { display: grid; grid-template-columns: minmax(0, 1fr) 270px; align-items: start; gap: 20px; }
+.scenario-card, .scenario-index { border: 1px solid #e5dfd4; border-radius: 16px; background: #fffdf9; padding: 23px; min-width: 0; }
+.scenario-card h2 { margin: 10px 0 20px; font-size: 1.55rem; line-height: 1.25; }
+.scenario-context { padding: 17px; background: #f6f2e8; border-radius: 12px; color: #27303b; line-height: 1.55; }
+.scenario-context p { margin: 8px 0 0; }
+.scenario-objective { line-height: 1.5; font-size: .93rem; color: #394654; }
+.scenario-options { border: 0; padding: 0; margin: 22px 0 0; display: flex; flex-direction: column; gap: 11px; min-width: 0; }
+.scenario-options legend { font-size: 1.05rem; font-weight: 700; margin-bottom: 15px; line-height: 1.4; }
+.scenario-option { cursor: pointer; display: flex; align-items: flex-start; gap: 12px; border: 1px solid #d5d5d2; border-radius: 11px; padding: 13px 15px; line-height: 1.45; min-height: 48px; color: #26313c; }
+.scenario-option input { margin-top: 4px; flex: none; accent-color: #134b7e; }
+.scenario-option-selected { background: #e8f2fa; border-color: #145c91; }
+.scenario-options:disabled .scenario-option { cursor: default; }
+.scenario-feedback { border-radius: 12px; padding: 15px 18px; margin: 18px 0; color: #22313a; line-height: 1.5; }
+.scenario-feedback p { margin: 7px 0; }
+.scenario-feedback-correct { background: #eaf6ed; border: 1px solid #7eb88d; }
+.scenario-feedback-review { background: #fff3de; border: 1px solid #c6a36b; }
+.scenario-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 20px; }
+.scenario-actions button:disabled { opacity: .48; cursor: not-allowed; }
+.scenario-index h3 { margin: 0 0 16px; font-size: 1.07rem; }
+.scenario-index-items { display: flex; flex-direction: column; gap: 6px; }
+.scenario-index-items button { text-align: left; display: flex; flex-direction: column; gap: 3px; border: 1px solid transparent; border-radius: 8px; padding: 10px; background: transparent; cursor: pointer; color: #243241; }
+.scenario-index-items button:hover, .scenario-index-items button:focus-visible { background: #f2f6fc; }
+.scenario-index-items button.scenario-index-active { background: #e7f1fb; border-color: #adc7dc; }
+.scenario-index-items small { color: #566677; font-size: .78rem; }
+.scenario-warning { border: 1px solid #c6a36b; padding: 12px; border-radius: 8px; }
+@media (max-width: 860px) { .scenario-layout { grid-template-columns: minmax(0,1fr); } .scenario-index { order: 2; } }
+@media (max-width: 550px) { .scenario-summary { grid-template-columns: 1fr; } .scenario-card, .scenario-index { padding: 15px; } .scenario-card h2 { font-size: 1.3rem; } }

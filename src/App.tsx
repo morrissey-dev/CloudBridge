@@ -39,6 +39,7 @@ import {
 import { getObjectivesForModule } from "./learningObjectives"
 import Icon, { type IconName } from "./components/Icon"
 import ModuleCard from "./components/ModuleCard"
+import ScenarioPracticeView from "./components/ScenarioPracticeView"
 
 type View =
 
@@ -53,6 +54,8 @@ type View =
   | "Flashcards"
 
   | "Case studies"
+
+  | "Scenario practice"
 
   | "Study plan"
 
@@ -69,6 +72,8 @@ const navItems: { label: View; icon: IconName }[] = [
   { label: "Flashcards", icon: "cards" },
 
   { label: "Case studies", icon: "target" },
+
+  { label: "Scenario practice", icon: "quiz" },
 
   { label: "Study plan", icon: "calendar" },
 
@@ -2529,6 +2534,8 @@ export default function App() {
           )}
 
           {view === "Case studies" && <CaseStudiesView />}
+
+          {view === "Scenario practice" && <ScenarioPracticeView onStudyActivity={recordStudyActivity} />}
 
           {view === "Study plan" && <StudyPlanView />}
 

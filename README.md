@@ -144,3 +144,18 @@ CloudBridge is a learning project intended to support Azure Fundamentals prepara
 **Content limitation:** New exam questions are marked for independent verification. Mapping an objective to a lesson does not prove the learner has mastered that objective; in particular, network-access configuration needs a hands-on exercise. CloudBridge is not affiliated with Microsoft and makes no certification guarantee.
 
 **Deployment:** On a computer with network access, run `npm ci`, `npm test`, `npx tsc --noEmit`, and `npm run build`. If a native binding error appears after copying `node_modules` from another operating system, remove that `node_modules` directory and run a clean installation using `npm ci`.
+
+
+## Version 1.2 — Objective-linked scenario practice (first milestone)
+
+- Added a **Scenario practice** page with 12 original applied-decision questions (four per AZ-900 domain).
+- Each question references an objective from the supplied `Learning objective.docx`, and the scenarios were authored using `Microsoft Azure.docx` as the study reference.
+- Learners choose answers, receive explanations and takeaways, and can retry. Latest results and attempt counts are saved in `cloudbridge-scenario-practice-v1`, independently of the existing lesson, quiz, and exam local-storage keys.
+- Added unit tests for scenario validation and saved-answer normalization.
+- This first milestone covers **12 of 63** mapped objectives. It is not a full objective-mastery system. Existing exam questions marked for verification are still pending review.
+- Production build was **not verified** in the development container because the uploaded dependency copy lacks Vite's native binding; install fresh dependencies on your machine with `npm ci`.
+
+### Upgrading without losing your code
+
+See [`docs/HOW-TO-UPGRADE-V1.2.md`](docs/HOW-TO-UPGRADE-V1.2.md).
+Use the incremental patch on a clean v1.1 working tree, not by overwriting your existing folder with this archive.
