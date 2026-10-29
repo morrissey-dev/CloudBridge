@@ -1,0 +1,64 @@
+id,text,moduleId,lessonTitle,kind,sourceParagraph
+LO-001,Define cloud computing.,cloud-concepts,Cloud computing,concept,1
+LO-002,Describe the shared responsibility model.,cloud-concepts,Shared responsibility,concept,2
+LO-003,"Define cloud models, including public, private, and hybrid.",cloud-concepts,Public cloud,concept,3
+LO-004,Identify appropriate use cases for each cloud model.,cloud-concepts,Hybrid cloud,concept,4
+LO-005,Describe the consumption-based model.,cloud-concepts,Consumption-based model,concept,5
+LO-006,Compare cloud pricing models.,cloud-concepts,Reservations,concept,6
+LO-007,Describe the benefits of high availability and scalability in the cloud.,cloud-concepts,High availability,concept,7
+LO-008,Describe the benefits of reliability and predictability in the cloud.,cloud-concepts,Reliability,concept,8
+LO-009,Describe the benefits of security and governance in the cloud.,cloud-concepts,Security and governance,concept,9
+LO-010,Describe the benefits of manageability in the cloud.,cloud-concepts,Management of and in the cloud,concept,10
+LO-011,Describe sustainability considerations and benefits in the cloud.,cloud-concepts,Sustainability,concept,11
+LO-012,Describe factors that can affect costs in Azure.,cloud-concepts,Resource type and settings,concept,12
+LO-013,Describe the Azure Pricing calculator.,cloud-concepts,Azure Pricing Calculator,concept,13
+LO-014,Describe the Microsoft Cost Management Tool.,cloud-concepts,Microsoft Cost Management,concept,14
+LO-015,Describe the purpose of tags.,cloud-concepts,Resource tags,concept,15
+LO-016,"Describe cost optimization options, including Reservations, savings plans, and Spot pricing.",cloud-concepts,Reservations,concept,16
+LO-017,Describe the purpose of Microsoft Purview,governance-security,Microsoft Purview,concept,32
+LO-018,Describe the purpose of Azure Policy,governance-security,Azure Policy,concept,33
+LO-019,How does Azure Policy define policies?,governance-security,Azure Policy,concept,34
+LO-020,What are Azure Policy initiatives?,governance-security,Policy initiatives and guardrails,concept,35
+LO-021,Describe the purpose of resource locks,governance-security,Resource locks,concept,36
+LO-022,Describe the purpose of the Service Trust portal,governance-security,Service Trust Portal,concept,37
+LO-023,Describe the Azure portal.,governance-security,Azure portal,concept,38
+LO-024,"Describe Azure Cloud Shell, including Azure CLI and Azure PowerShell.",governance-security,Azure Cloud Shell,concept,39
+LO-025,Describe the purpose of Azure Arc.,governance-security,Azure Arc,concept,40
+LO-026,"Describe Azure Resource Manager (ARM), ARM templates, and Bicep.",governance-security,ARM templates and Bicep,concept,41
+LO-027,Describe the purpose of Azure Advisor.,governance-security,Azure Advisor,concept,42
+LO-028,Describe Azure Service Health.,governance-security,"Azure Status, Service Health, and Resource Health",concept,43
+LO-029,"Describe Azure Monitor, including Azure Log Analytics, Azure Monitor Alerts, and Application Insights.",governance-security,Azure Monitor,concept,44
+LO-030,"Describe Azure regions, region pairs, and sovereign regions.",azure-architecture,Azure regions,concept,45
+LO-031,Describe Availability Zones.,azure-architecture,Availability zones,concept,46
+LO-032,Describe Azure datacenters.,azure-architecture,Azure datacenters,concept,47
+LO-033,Describe Azure resources and Resource Groups.,azure-architecture,Resource groups,concept,48
+LO-034,Describe subscriptions.,azure-architecture,Azure subscriptions,concept,49
+LO-035,Describe management groups.,azure-architecture,Management groups,concept,50
+LO-036,"Describe the hierarchy of resource groups, subscriptions, and management groups.",azure-architecture,The Azure hierarchy,concept,51
+LO-037,"Compare compute types, including container instances, virtual machines, and functions.",azure-services,Choosing a hosting option,concept,52
+LO-038,"Describe virtual machine options, including virtual machines (VMs), virtual machine scale sets, and virtual machine availability sets.",azure-services,Availability Sets,concept,53
+LO-039,Describe resources required for virtual machines.,azure-services,VM size families and resources,concept,54
+LO-040,"Describe application hosting options, including Azure Web Apps, containers, and virtual machines.",azure-services,Azure App Service,concept,55
+LO-041,"Describe AI, machine learning, and IoT/Edge service categories in Azure.",azure-services,Azure AI services and Azure OpenAI,concept,56
+LO-042,Recognize agentic AI as an application pattern built from Azure AI capabilities.,azure-services,Agentic AI pattern,concept,57
+LO-043,Describe Azure virtual networking,azure-services,Virtual networks and subnets,concept,58
+LO-044,Describe Azure virtual private networks,azure-services,VPN Gateway,concept,59
+LO-045,Describe Azure ExpressRoute,azure-services,Azure ExpressRoute,concept,60
+LO-046,Describe Azure DNS,azure-services,Azure DNS,concept,61
+LO-047,"Describe Azure virtual networking, including subnets and endpoints.",azure-services,Virtual networks and subnets,concept,62
+LO-048,Describe connectivity options with Azure VPN Gateway.,azure-services,VPN Gateway,concept,63
+LO-049,Describe when to use Azure ExpressRoute.,azure-services,Azure ExpressRoute,concept,64
+LO-050,Describe Azure DNS capabilities.,azure-services,Azure DNS,concept,65
+LO-051,Configure basic network access for an Azure resource.,azure-services,VNet peering and basic access,guided-practice,66
+LO-052,Describe Azure directory services,governance-security,Microsoft Entra ID,concept,67
+LO-053,What does Microsoft Entra ID do?,governance-security,Microsoft Entra ID,concept,68
+LO-054,What is Microsoft Entra Domain Services?,governance-security,Microsoft Entra Domain Services,concept,69
+LO-055,How does Microsoft Entra Domain Services work?,governance-security,Microsoft Entra Domain Services,concept,70
+LO-056,Describe Azure authentication methods,governance-security,Multifactor Authentication,concept,71
+LO-057,Describe Azure external identities,governance-security,External identities,concept,72
+LO-058,Describe Azure conditional access,governance-security,Conditional Access,concept,73
+LO-059,Describe Azure role-based access control,governance-security,Azure RBAC,concept,74
+LO-060,Describe Zero Trust model,governance-security,Zero Trust,concept,75
+LO-061,Describe defense-in-depth,governance-security,Defense in depth,concept,76
+LO-062,Describe encryption and key management in Azure,governance-security,Azure Key Vault,concept,77
+LO-063,Describe Microsoft Defender for Cloud,governance-security,Microsoft Defender for Cloud,concept,78

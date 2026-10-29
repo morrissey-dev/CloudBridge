@@ -208,3 +208,20 @@ test("study streak handles today, yesterday, gaps, and local date boundaries", (
 
   assert.equal(calculateStudyStreak([], today), 0)
 })
+
+test("knowledge checks completed counts passed modules once, not repeated attempts", () => {
+  const progress = createEmptyLearningProgress()
+  progress.modules[modules[0].id] = {
+    ...createEmptyModuleProgress(),
+    assessmentAttempts: [
+      { score: 6, passed: false, completedAt: "2026-10-26T10:00:00Z" },
+      { score: 8, passed: true, completedAt: "2026-10-26T11:00:00Z" },
+      { score: 9, passed: true, completedAt: "2026-10-27T11:00:00Z" },
+    ],
+  }
+  progress.modules[modules[1].id] = {
+    ...createEmptyModuleProgress(),
+    assessmentAttempts: [{ score: 7, passed: false, completedAt: "2026-10-27T12:00:00Z" }],
+  }
+  assert.equal(getLearningOverview(progress).completedKnowledgeChecks, 1)
+})

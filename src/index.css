@@ -3453,3 +3453,14 @@ footer {
     transition: none;
   }
 }
+
+/* V1.1: source-aligned study objectives, accessible on small screens */
+.source-objective-details { margin: 1rem 0 1.4rem; padding: 1rem 1.1rem; border: 1px solid #d6dfdf; border-radius: 14px; background: #f8faf9; color: #213534; }
+.source-objective-details summary { cursor: pointer; font-size: 0.95rem; font-weight: 650; line-height: 1.5; }
+.source-objective-details ol { margin: 1rem 0 0; padding-left: 1.35rem; }
+.source-objective-details li { margin: 0.45rem 0; line-height: 1.55; font-size: 0.94rem; }
+.objective-practice-tag { display: inline-block; margin-left: .5rem; font-weight: 650; font-size: .8rem; color: #72500c; }
+.lesson-objectives { margin: 1rem 0; padding: .8rem 1rem; border-left: 3px solid #ad8f44; background: #f8f7ef; border-radius: 4px 9px 9px 4px; color: #29403b; }
+.lesson-objectives strong { font-size: .88rem; }
+.lesson-objectives ul { margin: .4rem 0 0; padding-left: 1.1rem; }
+.lesson-objectives li { font-size: .9rem; line-height: 1.55; padding: .08rem 0; }

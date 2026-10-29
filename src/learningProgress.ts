@@ -30,6 +30,8 @@ export type ModuleLearningProgress = {
   finished: boolean
 
   assessmentAttempts: KnowledgeCheckAttempt[]
+
+  assessmentVersion?: "legacy" | "v2"
 }
 
 export type ExamSession = {
@@ -85,6 +87,7 @@ export const createEmptyModuleProgress = (): ModuleLearningProgress => ({
   finished: false,
 
   assessmentAttempts: [],
+  assessmentVersion: "v2",
 })
 
 export function createEmptyLearningProgress(): LearningProgress {
@@ -245,6 +248,9 @@ function normalizeModuleProgress(
     finished: value.finished === true,
 
     assessmentAttempts,
+    ...(value.assessmentVersion === "v2" || value.assessmentVersion === "legacy"
+      ? { assessmentVersion: value.assessmentVersion }
+      : {}),
   }
 }
 

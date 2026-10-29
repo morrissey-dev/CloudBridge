@@ -121,7 +121,7 @@ export function getLearningOverview(
 
     completedKnowledgeChecks: Object.values(progress.modules).reduce(
       (total, moduleProgress) =>
-        total + moduleProgress.assessmentAttempts.length,
+        total + Number(moduleProgress.assessmentAttempts.some((item) => item.passed)),
 
       0,
     ),

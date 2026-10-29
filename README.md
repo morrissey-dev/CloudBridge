@@ -1,73 +1,73 @@
-\# CloudBridge
+# CloudBridge
 
-\*\*Your bridge to Azure cloud confidence.\*\*
+**Your bridge to Azure cloud confidence.**
 
 CloudBridge is an unofficial Microsoft Azure Fundamentals (AZ-900) learning platform designed to help learners study cloud concepts, practise exam-style questions, and revise key topics in a structured way.
 
 
-\## The Problem
+## The Problem
 
 Learners preparing for AZ-900 need to understand a broad range of cloud concepts, Azure services, and management and governance topics. Relying on passive reading alone can make it difficult to identify knowledge gaps and prepare effectively.
 
 
-\## The Solution
+## The Solution
 
 CloudBridge brings learning and revision tools together in one platform, helping learners study concepts, test their understanding, and organise their preparation.
 
 
 
-\## Key Features
+## Key Features
 
 
-\- \*\*Learning Modules:\*\* Explore structured Azure Fundamentals learning content.
+- **Learning Modules:** Explore structured Azure Fundamentals learning content.
 
-\- \*\*Practice Quizzes:\*\* Take one of five randomized, non-overlapping 45-question AZ-900 practice exams with area-level scoring and answer review. New questions are visibly marked for verification against official Microsoft Learn documentation.
+- **Practice Quizzes:** Take one of five randomized, non-overlapping 45-question AZ-900 practice exams with area-level scoring and answer review. New questions are visibly marked for verification against official Microsoft Learn documentation.
 
-\- \*\*Flashcards:\*\* Review key terms and concepts.
+- **Flashcards:** Review key terms and concepts.
 
-\- \*\*Case Studies:\*\* Apply cloud concepts to practical scenarios.
+- **Case Studies:** Apply cloud concepts to practical scenarios.
 
-\- \*\*Study Planner:\*\* Organise revision sessions and learning goals.
+- **Study Planner:** Organise revision sessions and learning goals.
 
-\- \*\*My Learning:\*\* Track enrolled modules and learning progress.
+- **My Learning:** Track enrolled modules and learning progress.
 
 
 
-\## AZ-900 Learning Areas
+## AZ-900 Learning Areas
 
 
 CloudBridge is designed around the Azure Fundamentals learning objectives, including:
 
-\- Cloud concepts
+- Cloud concepts
 
-\- Azure architecture and services
+- Azure architecture and services
 
-\- Azure management and governance
-
-
-
-\## Technology Stack
-
-\- React
-
-\- TypeScript
-
-\- Vite
-
-\- CSS
+- Azure management and governance
 
 
 
-\## Getting Started
+## Technology Stack
 
-\### Prerequisites
+- React
+
+- TypeScript
+
+- Vite
+
+- CSS
 
 
 
-Install \[Node.js](https://nodejs.org/) and npm.
+## Getting Started
+
+### Prerequisites
 
 
-\### Installation
+
+Install [Node.js](https://nodejs.org/) and npm.
+
+
+### Installation
 
 
 
@@ -104,7 +104,7 @@ Follow the local URL printed in your terminal to open the application.
 
 
 
-\### Production Build
+### Production Build
 
 Run:
 
@@ -116,18 +116,31 @@ npm run build
 
 
 
-\## Progress and Data
+## Progress and Data
 
 Study plans and learning progress are stored locally in the browser where supported by the application. Lesson positions, completed lessons, knowledge-check answers and results, unfinished practice exams, and completed exam history are included. Progress is not necessarily synchronised between different devices or browsers.
 
 The first-visit welcome screen stores its completion flag separately in browser local storage; it does not replace or reset learning progress. Existing enrollment, started-module, and completed-module data remains in its original storage keys. Curriculum topic and lesson counts, module completion percentages, assessment results, exam averages, daily study dates, and consecutive-day streaks are calculated from saved progress and the curriculum. Study activity is recorded when a learner completes lesson steps, submits quiz answers, or reviews flashcards; multiple study actions on one local calendar day count as one study day.
 
-\## Project Status
+## Project Status
 
 CloudBridge is a learning project intended to support Azure Fundamentals preparation. It is not an official Microsoft product, and it does not replace Microsoft's official learning materials.
 
 
 
-\## Repository
+## Repository
 
-\[https://github.com/morrissey-dev/CloudBridge](https://github.com/morrissey-dev/CloudBridge)
+[https://github.com/morrissey-dev/CloudBridge](https://github.com/morrissey-dev/CloudBridge)
+
+## Version 1.1 — Source-aligned assessment improvements
+
+- 63 unique objectives from the user-provided learning objectives document are linked to existing lessons. See `docs/learning-objective-alignment.csv`.
+- New assessments select 10 concepts from across module sections, rotating through the complete curriculum across repeated attempts. Old, partially completed assessments continue using their original questions and answers until a retry.
+- Five independent 45-question exams each contain 13 cloud concepts, 18 architecture/services and 14 management/governance questions, matching the AZ-900 target percentage bands.
+- Reclassified identity/access/security questions into their official AZ-900 area and added 18 source-based governance study questions.
+- The dashboard's knowledge-check-completion count represents distinct modules with passing checks, not the number of retries.
+- Practice exam raw percentages are labelled as CloudBridge scores rather than Microsoft certification scaled scores.
+
+**Content limitation:** New exam questions are marked for independent verification. Mapping an objective to a lesson does not prove the learner has mastered that objective; in particular, network-access configuration needs a hands-on exercise. CloudBridge is not affiliated with Microsoft and makes no certification guarantee.
+
+**Deployment:** On a computer with network access, run `npm ci`, `npm test`, `npx tsc --noEmit`, and `npm run build`. If a native binding error appears after copying `node_modules` from another operating system, remove that `node_modules` directory and run a clean installation using `npm ci`.

@@ -36,6 +36,7 @@ import {
   getLearningOverview,
   getModuleLessonProgress,
 } from "./learningStatistics"
+import { getObjectivesForModule } from "./learningObjectives"
 import Icon, { type IconName } from "./components/Icon"
 import ModuleCard from "./components/ModuleCard"
 
@@ -588,10 +589,19 @@ function ModuleDetail({
 
   )
 
-  const assessment = useMemo(
-    () => createKnowledgeCheckQuestions(module),
-    [module],
+  const [assessmentVersion, setAssessmentVersion] = useState<"legacy" | "v2">(
+    savedProgress.assessmentVersion ?? "legacy",
   )
+  const [assessmentRound, setAssessmentRound] = useState(
+    savedProgress.finished
+      ? Math.max(0, savedProgress.assessmentAttempts.length - 1)
+      : savedProgress.assessmentAttempts.length,
+  )
+  const assessment = useMemo(
+    () => createKnowledgeCheckQuestions(module, assessmentRound, assessmentVersion),
+    [module, assessmentRound, assessmentVersion],
+  )
+  const sourceObjectives = useMemo(() => getObjectivesForModule(module.id), [module.id])
 
   const [phase, setPhase] = useState<"lessons" | "assessment">(savedProgress.phase)
 
@@ -647,6 +657,7 @@ function ModuleDetail({
       score,
       finished,
       assessmentAttempts,
+      assessmentVersion,
     }
     if (JSON.stringify(progress) !== JSON.stringify(savedProgress)) {
       onProgressChange(module.id, progress)
@@ -654,6 +665,7 @@ function ModuleDetail({
   }, [
     answers,
     assessmentAttempts,
+    assessmentVersion,
     completedLessonIndexes,
     finished,
     lessonIndex,
@@ -705,6 +717,9 @@ function ModuleDetail({
 
   function retryAssessment() {
 
+    // Start the new source-aligned rotation only after resetting prior answers.
+    setAssessmentRound(assessmentAttempts.length)
+    setAssessmentVersion("v2")
     setQuestionIndex(0)
 
     setSelected(null)
@@ -781,6 +796,20 @@ function ModuleDetail({
 
       </section>
 
+      <details className="source-objective-details">
+        <summary>View all {sourceObjectives.length} objectives from your Azure study notes</summary>
+        <ol>
+          {sourceObjectives.map((objective) => (
+            <li key={objective.id}>
+              {objective.text}
+              {objective.kind === "guided-practice" && (
+                <span className="objective-practice-tag">Requires hands-on practice</span>
+              )}
+            </li>
+          ))}
+        </ol>
+      </details>
+
       {phase === "lessons" ? (
 
         <section className="lesson-player">
@@ -824,6 +853,17 @@ function ModuleDetail({
             </div>
 
             <div className="guided-lesson-title">{lesson.title}</div>
+
+            {sourceObjectives.some((objective) => objective.lessonTitle === lesson.title) && (
+              <div className="lesson-objectives">
+                <strong>From your learning objectives</strong>
+                <ul>
+                  {sourceObjectives.filter((objective) => objective.lessonTitle === lesson.title).map((objective) => (
+                    <li key={objective.id}>{objective.text}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             <p>{lesson.definition}</p>
 
@@ -916,7 +956,7 @@ function ModuleDetail({
 
                 Complete the assessment successfully to enable module completion
 
-                and unlock the next module.
+                before marking this module complete. All modules remain available to explore.
 
               </p>
 
@@ -1437,7 +1477,7 @@ function QuizView({
         <div className="view-intro">
           <div className="eyebrow">Exam practice</div>
           <div className="view-title">Build confidence, one practice exam at a time.</div>
-          <p>Each attempt contains 45 questions from its own fixed pool across the three AZ-900 knowledge areas. Question and answer order are randomized. Answers and explanations appear in your results review.</p>
+          <p>Each exam contains 45 non-overlapping questions: 13 cloud concepts, 18 architecture and services, and 14 management and governance. Question and answer order are randomized. Answers and explanations appear in your results review.</p>
           <p className="exam-verification-note">Questions marked “Needs Microsoft Learn verification” are new original study questions pending documentation review.</p>
         </div>
         <div className="module-card-grid exam-choice-grid">
@@ -1500,11 +1540,11 @@ function QuizView({
 
     return (
       <section className="quiz-view">
-        <div className={`assessment-result exam-result ${percentage >= 70 ? "result-pass" : ""}`}>
-          <div className="result-icon"><Icon name={percentage >= 70 ? "check" : "book"} size={27} /></div>
+        <div className="assessment-result exam-result">
+          <div className="result-icon"><Icon name="book" size={27} /></div>
           <div className="eyebrow">{exam.title} complete</div>
           <div className="result-title">{score} out of {attempt.length}</div>
-          <p>{percentage}% correct · Unanswered questions count as incorrect.</p>
+          <p>{percentage}% correct · CloudBridge practice percentage (not Microsoft's scaled exam score). Unanswered questions count as incorrect.</p>
           <div className="result-category-grid">
             {examCategories.map((category) => {
               const categoryQuestions = attempt.filter((item) => item.question.category === category)

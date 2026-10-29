@@ -30,21 +30,66 @@ export type KnowledgeQuestion = {
 
 export function createKnowledgeCheckQuestions(
   module: CourseModule,
+  round = 0,
+  version: "v2" | "legacy" = "v2",
 ): KnowledgeQuestion[] {
   const concepts = module.sections.flatMap((section) => section.concepts)
+  const questionCount = Math.min(10, concepts.length)
 
-  return Array.from({ length: Math.min(10, concepts.length) }, (_, index) => {
-    const current = concepts[index % concepts.length]
+  if (!Number.isInteger(round) || round < 0) {
+    throw new Error("Assessment round must be a non-negative integer.")
+  }
+
+  // Earlier CloudBridge builds always tested the first ten concepts. Retaining
+  // that precise sequence prevents existing in-progress answers from changing.
+  if (version === "legacy") {
+    return Array.from({ length: questionCount }, (_, index) => {
+      const current = concepts[index]
+      const distractorPool = concepts
+        .filter((concept) => concept.title !== current.title)
+        .map((concept) => concept.definition)
+      const distractors = [0, 1, 2].map(
+        (offset) => distractorPool[(index + offset) % distractorPool.length],
+      )
+      const answer = index % 4
+      const options = [...distractors]
+      options.splice(answer, 0, current.definition)
+      return {
+        concept: current.title,
+        prompt: `Which explanation best describes “${current.title}”?`,
+        options,
+        answer,
+      }
+    })
+  }
+
+  // Interleave all sections once, then select consecutive windows of ten.
+  // Each new assessment round continues where the previous round ended;
+  // all lessons are eventually tested instead of repeatedly using the start.
+  const sections = module.sections.filter((section) => section.concepts.length)
+  const interleaved: typeof concepts = []
+  const longest = Math.max(...sections.map((section) => section.concepts.length))
+  for (let depth = 0; depth < longest; depth += 1) {
+    for (const section of sections) {
+      if (section.concepts[depth]) interleaved.push(section.concepts[depth])
+    }
+  }
+  const chosen = Array.from(
+    { length: questionCount },
+    (_, index) => interleaved[(round * questionCount + index) % interleaved.length],
+  )
+
+  return chosen.map((current, index) => {
     const distractorPool = concepts
       .filter((concept) => concept.title !== current.title)
       .map((concept) => concept.definition)
+    const offset = (round * questionCount + index * 3) % distractorPool.length
     const distractors = [0, 1, 2].map(
-      (offset) => distractorPool[(index + offset) % distractorPool.length],
+      (i) => distractorPool[(offset + i) % distractorPool.length],
     )
-    const answer = index % 4
+    const answer = (index + round) % 4
     const options = [...distractors]
     options.splice(answer, 0, current.definition)
-
     return {
       concept: current.title,
       prompt: `Which explanation best describes “${current.title}”?`,
@@ -91,46 +136,54 @@ export function shuffleItems<T>(
   return result
 }
 
+/** Exam composition for the 25–30 / 35–40 / 30–35 percent AZ-900 domains.
+ * A 45-question pool uses 13 / 18 / 14 respectively. Five disjoint pools
+ * need 65 / 90 / 70; the present bank provides 82 / 94 / 70.
+ */
+const targetDistribution = [
+  { category: "Cloud concepts", share: 13 },
+  { category: "Azure architecture and services", share: 18 },
+  { category: "Azure management and governance", share: 14 },
+] as const
+
 export function createPracticeExamPools(
   questionBank: readonly AZ900Question[] = az900ExamQuestions,
-
   examCount = practiceExams.length,
-
   questionsPerExam = 45,
 ): AZ900Question[][] {
   if (!Number.isInteger(examCount) || examCount < 1) {
     throw new Error("At least one practice exam pool is required.")
   }
-
   if (!Number.isInteger(questionsPerExam) || questionsPerExam < 1) {
     throw new Error("Practice exam question count must be a positive integer.")
   }
-
-  if (questionBank.length < examCount * questionsPerExam) {
-    throw new Error(
-      `The question bank must contain at least ${examCount * questionsPerExam} questions for ${examCount} non-overlapping exams.`,
-    )
+  if (questionsPerExam !== 45) {
+    throw new Error("Aligned AZ-900 pools currently require 45 questions per exam.")
   }
 
-  const pools = Array.from({ length: examCount }, (_, poolIndex) =>
-    questionBank
-
-      .filter((_, questionIndex) => questionIndex % examCount === poolIndex)
-
-      .slice(0, questionsPerExam),
-  )
+  const pools: AZ900Question[][] = Array.from({ length: examCount }, () => [])
+  for (const { category, share } of targetDistribution) {
+    const available = questionBank.filter((question) => question.category === category)
+    const required = share * examCount
+    if (available.length < required) {
+      throw new Error(
+        `Not enough ${category} questions for ${examCount} aligned exams: ` +
+          `${available.length} available, ${required} required.`,
+      )
+    }
+    // Round-robin category distribution spreads successive authored questions
+    // across exams while keeping all exam question IDs non-overlapping.
+    for (let examIndex = 0; examIndex < examCount; examIndex += 1) {
+      for (let questionIndex = 0; questionIndex < share; questionIndex += 1) {
+        pools[examIndex].push(available[questionIndex * examCount + examIndex])
+      }
+    }
+  }
 
   const ids = pools.flat().map((question) => question.id)
-
-  if (
-    pools.some((pool) => pool.length !== questionsPerExam) ||
-    new Set(ids).size !== ids.length
-  ) {
-    throw new Error(
-      "Practice exam pools must be complete and contain unique questions.",
-    )
+  if (pools.some((pool) => pool.length !== questionsPerExam) || new Set(ids).size !== ids.length) {
+    throw new Error("Practice exam pools must be complete and contain unique questions.")
   }
-
   return pools
 }
 

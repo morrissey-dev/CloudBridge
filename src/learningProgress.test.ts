@@ -45,7 +45,7 @@ function makeExamSession(examId: string): ExamSession {
       ]),
     ),
 
-    answers: { [questionIds[0]]: lastQuestion.options[0] },
+    answers: { [questionIds[0]]: lastQuestion.correctAnswer },
     index: 4,
   }
 }
