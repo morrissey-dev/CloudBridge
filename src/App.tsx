@@ -43,6 +43,17 @@ import ScenarioPracticeView from "./components/ScenarioPracticeView"
 import ObjectivesTrackerView from "./components/ObjectivesTrackerView"
 import AzureLabsView from "./components/AzureLabsView"
 import { currentQuestionAudit, summarizeExamReviewStatus } from "./questionQuality"
+import LearningInsightsView from "./components/LearningInsightsView"
+import { normalizeScenarioProgress, scenarioProgressStorageKey } from "./scenarioProgress"
+
+function readInsightsScenarioProgress() {
+  try {
+    const saved = window.localStorage.getItem(scenarioProgressStorageKey)
+    return saved ? normalizeScenarioProgress(JSON.parse(saved)) : {}
+  } catch {
+    return {}
+  }
+}
 
 type View =
 
@@ -61,6 +72,7 @@ type View =
   | "Scenario practice"
 
   | "Learning objectives"
+  | "Learning insights"
   | "Azure labs"
 
   | "Study plan"
@@ -82,6 +94,7 @@ const navItems: { label: View; icon: IconName }[] = [
   { label: "Scenario practice", icon: "quiz" },
 
   { label: "Learning objectives", icon: "target" },
+  { label: "Learning insights", icon: "check" },
 
   { label: "Azure labs", icon: "book" },
 
@@ -2224,6 +2237,7 @@ export default function App() {
 
   const [view, setView] = useState<View>("Home")
   const [scenarioObjectiveId, setScenarioObjectiveId] = useState<string | null>(null)
+  const [scenarioCategory, setScenarioCategory] = useState<AZ900Category | null>(null)
   const [welcomeCompleted, setWelcomeCompleted] = useState(hasCompletedWelcome)
   const [initialLearningProgress] = useState(readBrowserLearningProgress)
   const [learningProgress, setLearningProgress] = useState(initialLearningProgress.progress)
@@ -2555,7 +2569,20 @@ export default function App() {
 
           {view === "Case studies" && <CaseStudiesView />}
 
-          {view === "Scenario practice" && <ScenarioPracticeView onStudyActivity={recordStudyActivity} initialObjectiveId={scenarioObjectiveId} />}
+          {view === "Scenario practice" && <ScenarioPracticeView onStudyActivity={recordStudyActivity} initialObjectiveId={scenarioObjectiveId} initialCategory={scenarioCategory} />}
+
+          {view === "Learning insights" && (
+            <LearningInsightsView
+              learningProgress={learningProgress}
+              scenarioProgress={readInsightsScenarioProgress()}
+              onBrowseLessons={() => navigate("Modules")}
+              onReviewDomain={(category) => {
+                setScenarioObjectiveId(null)
+                setScenarioCategory(category)
+                navigate("Scenario practice")
+              }}
+            />
+          )}
 
           {view === "Azure labs" && <AzureLabsView onStudyActivity={recordStudyActivity} />}
 
@@ -2564,7 +2591,7 @@ export default function App() {
               learningProgress={learningProgress}
               legacyCompletedModuleIds={legacyCompletedModuleIds}
               onBrowseModules={() => navigate("Modules")}
-              onOpenScenarios={(objectiveId) => { navigate("Scenario practice"); setScenarioObjectiveId(objectiveId) }}
+              onOpenScenarios={(objectiveId) => { setScenarioCategory(null); setScenarioObjectiveId(objectiveId); navigate("Scenario practice") }}
             />
           )}
 

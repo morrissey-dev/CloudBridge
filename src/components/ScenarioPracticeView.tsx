@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import type { AZ900Category } from "../az900Exam"
 import { sourceLearningObjectives } from "../learningObjectives"
 import { scenarioQuestions } from "../scenarioQuestions"
 import { filterScenarios, getScenarioReviewSummary, type ScenarioFilter } from "../scenarioFilters"
@@ -19,14 +20,16 @@ function getStoredScenarioProgress(): ScenarioProgress {
   }
 }
 
-export default function ScenarioPracticeView({ onStudyActivity, initialObjectiveId }: {
+export default function ScenarioPracticeView({ onStudyActivity, initialObjectiveId, initialCategory }: {
   onStudyActivity: () => void
   initialObjectiveId?: string | null
+  initialCategory?: AZ900Category | null
 }) {
   const [progress, setProgress] = useState<ScenarioProgress>(getStoredScenarioProgress)
-  const [filter, setFilter] = useState<ScenarioFilter>("all")
+  const [filter, setFilter] = useState<ScenarioFilter>(initialObjectiveId ? "all" : initialCategory ?? "all")
   const [activeScenarioId, setActiveScenarioId] = useState(() =>
-    scenarioQuestions.find((item) => item.objectiveId === initialObjectiveId)?.id ?? scenarioQuestions[0].id,
+    scenarioQuestions.find((item) => item.objectiveId === initialObjectiveId)?.id ??
+    scenarioQuestions.find((item) => item.category === initialCategory)?.id ?? scenarioQuestions[0].id,
   )
   const [selected, setSelected] = useState<number | null>(null)
   const [submitted, setSubmitted] = useState(false)

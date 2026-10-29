@@ -3577,3 +3577,22 @@ footer {
 .hands-on-checklist legend { font-weight: 700; margin-bottom: 0.7rem; }
 .hands-on-checklist label { display: flex; align-items: flex-start; gap: 0.65rem; margin-bottom: 0.8rem; cursor: pointer; font-size: 0.95rem; line-height: 1.55; }
 .hands-on-checklist input { flex: 0 0 auto; width: 1.1rem; height: 1.1rem; margin-top: 0.2rem; }
+
+/* V1.7 accessible, mobile-first learning insights */
+.insights-view { max-width: 1040px; margin: 0 auto; }
+.insights-summary { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; margin: 20px 0 26px; }
+.insights-summary > div { display: flex; flex-direction: column; gap: 8px; background: var(--surface, #fff); border: 1px solid #d8dfe5; padding: 18px; border-radius: 12px; }
+.insights-summary strong { font-size: 1.55rem; line-height: 1.3; }
+.insights-summary span, .insights-domain small, .insights-history-row small { font-size: .9rem; line-height: 1.5; }
+.insights-panel { border: 1px solid #d8dfe5; border-radius: 14px; padding: 20px; margin-bottom: 20px; }
+.insights-panel h2 { font-size: 1.3rem; margin: 0 0 10px; }
+.insights-domain { border-top: 1px solid #e4e9ec; padding: 18px 0; }
+.insights-domain-heading { display: flex; gap: 14px; justify-content: space-between; flex-wrap: wrap; }
+.insights-domain > small { display: block; margin: 8px 0 12px; }
+.insights-track { height: 10px; border-radius: 9px; background: #dfe8ee; overflow: hidden; margin-top: 11px; }
+.insights-track > span { display: block; height: 100%; background: #166c86; border-radius: 9px; }
+.insights-tip { border-left: 3px solid #166c86; padding: 10px 14px; margin: 12px 0; background: #eaf5f6; color: #143d50; }
+.insights-history-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; border-bottom: 1px solid #e4e9ec; padding: 12px 0; }
+.insights-history-row > span { display: flex; flex-direction: column; gap: 3px; }
+@media (max-width: 700px) { .insights-summary { grid-template-columns: repeat(2,minmax(0,1fr)); } .insights-panel { padding: 15px; } .insights-summary > div { padding: 12px; } }
+@media (max-width: 360px) { .insights-summary { grid-template-columns: 1fr; } }

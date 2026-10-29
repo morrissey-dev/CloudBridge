@@ -194,3 +194,9 @@ Use the incremental patch on a clean v1.1 working tree, not by overwriting your 
 - Expanded automated tests to 41 passing cases; TypeScript check passed. Production Vite build still needs a clean local dependency install to verify.
 
 See `docs/V1.3-RELEASE-NOTES.md` and `docs/HOW-TO-UPGRADE-V1.3.md` for details.
+
+## CloudBridge V1.7 — Learning insights and question review
+
+Open **Learning insights** in the sidebar to review latest-per-exam performance by AZ-900 domain, recent attempts, and targeted scenario-practice links. Results are descriptive practice activity only, not validated exam predictions. Retakes do not inflate the domain chart.
+
+Run `npm run review:export` to regenerate `docs/QUESTION-REVIEW-QUEUE-V1.7.csv` from the source question bank; this does not mark any question approved. See `docs/INITIAL-MICROREVIEW-V1.7.md` for the small Microsoft Learn cross-check and its review limitations. Upgrade instructions: `docs/HOW-TO-UPGRADE-V1.7.md`.
