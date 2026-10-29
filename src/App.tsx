@@ -43,6 +43,8 @@ import ScenarioPracticeView from "./components/ScenarioPracticeView"
 import ObjectivesTrackerView from "./components/ObjectivesTrackerView"
 import AzureLabsView from "./components/AzureLabsView"
 import { currentQuestionAudit, summarizeExamReviewStatus } from "./questionQuality"
+import { getAuthoredChoiceFeedback, getFeedbackCoverage, getFurtherReading } from "./examFeedback"
+import { countMissedAnswers, filterExamReview, type ExamReviewFilter } from "./examReview"
 import LearningInsightsView from "./components/LearningInsightsView"
 import RevisionCoach from "./components/RevisionCoach"
 import { normalizeScenarioProgress, scenarioProgressStorageKey } from "./scenarioProgress"
@@ -1426,6 +1428,7 @@ function QuizView({
   )
   const [finished, setFinished] = useState(false)
   const [confirmSubmit, setConfirmSubmit] = useState(false)
+  const [reviewFilter, setReviewFilter] = useState<ExamReviewFilter>("all")
   const exam = practiceExams.find((item) => item.id === examId) ?? null
   const current = attempt[index]
   const question = current?.question
@@ -1446,6 +1449,7 @@ function QuizView({
     setAnswers(session.answers)
     setFinished(false)
     setConfirmSubmit(false)
+    setReviewFilter("all")
   }
 
   function selectAnswer(answer: string) {
@@ -1602,17 +1606,29 @@ function QuizView({
         </div>
         <section aria-label="Exam answer review" className="exam-review">
           <div className="view-title">Answer review</div>
-          {attempt.map(({ question: item }, questionIndex) => (
+          <p className="exam-verification-note">{getFeedbackCoverage(attempt.map(entry => entry.question)).withAuthoredFeedback} of {attempt.length} questions in this attempt include detailed feedback for each answer choice. Other questions show their existing general explanations pending further editorial review.</p>
+          <div className="result-actions" role="group" aria-label="Filter reviewed questions">
+            <button className="secondary-control" aria-pressed={reviewFilter === "all"} onClick={() => setReviewFilter("all")}>All questions ({attempt.length})</button>
+            <button className="secondary-control" aria-pressed={reviewFilter === "missed"} onClick={() => setReviewFilter("missed")}>Incorrect &amp; unanswered ({countMissedAnswers(attempt, answers)})</button>
+          </div>
+          {filterExamReview(attempt, answers, reviewFilter).length === 0 && <p>All questions were answered correctly in this attempt.</p>}
+          {filterExamReview(attempt, answers, reviewFilter).map(({ question: item }) => (
             <details className="exam-review-item" key={item.id}>
               <summary>
-                <span>Question {questionIndex + 1}: {item.question}</span>
+                <span>Question {attempt.findIndex(entry => entry.question.id === item.id) + 1}: {item.question}</span>
                 <b>{answers[item.id] === item.correctAnswer ? "Correct" : answers[item.id] ? "Incorrect" : "Unanswered"}</b>
               </summary>
               <div className="exam-review-content">
                 <p><strong>Your answer:</strong> {answers[item.id] ?? "Not answered"}</p>
                 <p><strong>Correct answer:</strong> {item.correctAnswer}</p>
                 <p>{item.explanation}</p>
+                {answers[item.id] && getAuthoredChoiceFeedback(item, answers[item.id]) && (
+                  <p className="exam-choice-feedback"><strong>Why your choice {answers[item.id] === item.correctAnswer ? "fits" : "doesn't fit"}:</strong> {getAuthoredChoiceFeedback(item, answers[item.id])}</p>
+                )}
                 <small>{item.category} · {item.objective} · {item.difficulty}</small>
+                {getFurtherReading(item) && (
+                  <p className="exam-verification-note">Further reading: <a href={getFurtherReading(item)!} target="_blank" rel="noopener noreferrer">Microsoft Learn reference</a> (does not imply official approval of this practice question).</p>
+                )}
                 {item.verificationStatus === "needs-verification" && (
                   <p className="exam-verification-note">
                     Needs verification against official Microsoft Learn documentation.

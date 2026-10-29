@@ -2,6 +2,8 @@
 
 **Your bridge to Azure cloud confidence.**
 
+**Version 1.9.0:** 18 source-notes-reviewed governance questions now have individual answer-choice explanations; practice-exam results have a missed-question filter, and the editorial CSV exports those explanations and suggested official reading links. These are *editorial study aids*, not independent certification of the question bank.
+
 CloudBridge is an unofficial Microsoft Azure Fundamentals (AZ-900) learning platform designed to help learners study cloud concepts, practise exam-style questions, and revise key topics in a structured way.
 
 

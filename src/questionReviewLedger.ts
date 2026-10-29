@@ -1,4 +1,5 @@
 import { az900ExamQuestions, type AZ900Question } from "./az900Exam.ts"
+import { getAuthoredChoiceFeedback, getFurtherReading } from "./examFeedback.ts"
 
 export type ReviewQueueItem = {
   id: string
@@ -53,11 +54,17 @@ function csvCell(value: string): string {
 export function buildReviewQueueCSV(questions: readonly AZ900Question[] = az900ExamQuestions): string {
   const lines = [[
     "question_id", "domain", "learning_objective", "difficulty", "stem", "option_a", "option_b", "option_c", "option_d", "expected_answer", "answer_explanation", "review_stage", "official_doc_review_pending", "existing_source", "structural_warnings", "official_doc_url_to_fill", "reviewer_to_fill", "review_date_to_fill", "editorial_decision_to_fill",
+    "authored_option_a_feedback", "authored_option_b_feedback", "authored_option_c_feedback", "authored_option_d_feedback", "suggested_microsoft_learn_reference",
   ].map(csvCell).join(",")]
   for (const item of getReviewQueue(questions)) {
     lines.push([
       item.id, item.category, item.objective, item.difficulty, item.stem, ...item.choices, item.expectedAnswer, item.explanation, item.reviewStage, "YES",
       item.source, item.warnings.join("; "), "", "", "", "",
+      ...item.choices.map(choice => {
+        const originalQuestion = questions.find(q => q.id === item.id)
+        return originalQuestion ? getAuthoredChoiceFeedback(originalQuestion, choice) ?? "" : ""
+      }),
+      getFurtherReading(questions.find(q => q.id === item.id)!) ?? "",
     ].map(csvCell).join(","))
   }
   return lines.join("\n") + "\n"
