@@ -6,6 +6,7 @@ export const progressBackupKeys = [
   "cloudbridge-completed-v1",
   "cloudbridge-learning-progress-v1",
   "cloudbridge-scenario-practice-v1",
+  "cloudbridge-lab-progress-v1",
   "cloudbridge-objective-confidence-v1",
   "cloudbridge-study-plan-v1",
   "cloudbridge-plan-date",

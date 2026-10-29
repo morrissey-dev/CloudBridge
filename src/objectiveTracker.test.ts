@@ -40,5 +40,5 @@ test("confidence does not imply a completed lesson or a correct answer", () => {
   assert.equal(result.lessonsCompleted, 0)
   assert.equal(result.objectivesPracticed, 0)
   assert.equal(result.total, 63)
-  assert.equal(result.objectivesWithScenarios, 36)
+  assert.equal(result.objectivesWithScenarios, 63)
 })

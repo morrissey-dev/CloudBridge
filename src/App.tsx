@@ -41,6 +41,7 @@ import Icon, { type IconName } from "./components/Icon"
 import ModuleCard from "./components/ModuleCard"
 import ScenarioPracticeView from "./components/ScenarioPracticeView"
 import ObjectivesTrackerView from "./components/ObjectivesTrackerView"
+import AzureLabsView from "./components/AzureLabsView"
 import { currentQuestionAudit } from "./questionQuality"
 
 type View =
@@ -60,6 +61,7 @@ type View =
   | "Scenario practice"
 
   | "Learning objectives"
+  | "Azure labs"
 
   | "Study plan"
 
@@ -80,6 +82,8 @@ const navItems: { label: View; icon: IconName }[] = [
   { label: "Scenario practice", icon: "quiz" },
 
   { label: "Learning objectives", icon: "target" },
+
+  { label: "Azure labs", icon: "book" },
 
   { label: "Study plan", icon: "calendar" },
 
@@ -2550,6 +2554,8 @@ export default function App() {
           {view === "Case studies" && <CaseStudiesView />}
 
           {view === "Scenario practice" && <ScenarioPracticeView onStudyActivity={recordStudyActivity} initialObjectiveId={scenarioObjectiveId} />}
+
+          {view === "Azure labs" && <AzureLabsView onStudyActivity={recordStudyActivity} />}
 
           {view === "Learning objectives" && (
             <ObjectivesTrackerView

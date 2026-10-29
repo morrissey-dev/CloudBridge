@@ -89,7 +89,7 @@ export default function ScenarioPracticeView({ onStudyActivity, initialObjective
   return (
     <section className="scenario-view" aria-label="Objective-aligned scenario practice">
       <div className="view-intro">
-        <div className="eyebrow">CloudBridge V1.4 · Learn by applying</div>
+        <div className="eyebrow">CloudBridge V1.5 · Learn by applying</div>
         <h1 className="view-title">Scenario practice</h1>
         <p>Make decisions in realistic cloud situations. Each question links to an objective from your learning materials and explains the answer after you try.</p>
         <p className="scenario-source-note">CloudBridge-created practice, not official Microsoft exam questions. Scenarios currently support {new Set(scenarioQuestions.map((item) => item.objectiveId)).size} of {sourceLearningObjectives.length} mapped objectives. The remaining objectives need further assessment; one answered scenario does not prove mastery.</p>

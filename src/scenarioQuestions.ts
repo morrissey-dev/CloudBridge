@@ -1,6 +1,7 @@
 import type { AZ900Category } from "./az900Exam.ts"
 import { sourceLearningObjectives } from "./learningObjectives.ts"
 import { scenarioQuestionsV14 } from "./scenarioQuestionsV14.ts"
+import { scenarioQuestionsV15 } from "./scenarioQuestionsV15.ts"
 
 /** Original scenarios written for CloudBridge using the user's supplied Azure
  * Fundamentals notes and learning-objective list. Not official Microsoft questions.
@@ -141,6 +142,7 @@ export const scenarioQuestions: readonly ScenarioQuestion[] = [
     takeaway: "Use monitoring data to investigate performance rather than guessing at causes.",
   },
   ...scenarioQuestionsV14,
+  ...scenarioQuestionsV15,
 ]
 
 export function validateScenarioBank(): string[] {

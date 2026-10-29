@@ -3551,3 +3551,17 @@ footer {
   .scenario-filter-tools { align-items: stretch; flex-direction: column; }
   .scenario-filter-tools select { width: 100%; }
 }
+
+/* V1.5 interactive learning labs */
+.labs-view { max-width: 1160px; margin: 0 auto; }
+.lab-switcher { display: flex; flex-wrap: wrap; gap: 12px; margin: 22px 0; }
+.lab-layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.8fr); align-items: start; gap: 20px; }
+.lab-panel { min-width: 0; border: 1px solid var(--line); background: var(--surface); border-radius: 17px; padding: clamp(18px, 2.5vw, 28px); }
+.lab-panel > h2 { font-size: clamp(1.25rem, 2vw, 1.6rem); margin: 8px 0; }
+.lab-panel > p { line-height: 1.65; }
+.lab-previous { border-left: 4px solid var(--gold); background: var(--gold-pale); padding: 11px 14px; border-radius: 6px; }
+.lab-takeaway { margin-top: 22px; font-size: .93rem; color: var(--muted); }
+.lab-objectives ol { padding-left: 22px; }
+.lab-objectives li { margin: 16px 0; line-height: 1.55; }
+.lab-objectives li p { color: var(--muted); margin: 5px 0; }
+@media (max-width: 860px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }

@@ -110,7 +110,7 @@ export default function ObjectivesTrackerView({
   return (
     <section className="objective-hub" aria-labelledby="objective-hub-title">
       <div className="view-intro">
-        <div className="eyebrow">CloudBridge V1.4 · Your learning roadmap</div>
+        <div className="eyebrow">CloudBridge V1.5 · Your learning roadmap</div>
         <h1 id="objective-hub-title" className="view-title">Learning objectives</h1>
         <p>Track the 63 distinct objectives from your study materials, see which lessons you have completed, and identify the objectives with practical-scenario evidence.</p>
         <p className="scenario-source-note"><strong>Important:</strong> “Confident” is your personal reflection. One correct scenario answer is evidence of practice, not a verified mastery score or a predicted Microsoft exam result.</p>

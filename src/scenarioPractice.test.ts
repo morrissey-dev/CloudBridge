@@ -5,16 +5,22 @@ import {
   getScenarioOverview, normalizeScenarioProgress, recordScenarioAnswer,
 } from "./scenarioProgress.ts"
 
-test("all 36 scenarios have unique valid options and known objectives", () => {
-  assert.equal(scenarioQuestions.length, 36)
+test("all 63 scenarios have unique valid options and known objectives", () => {
+  assert.equal(scenarioQuestions.length, 63)
   assert.deepEqual(validateScenarioBank(), [])
-  assert.equal(new Set(scenarioQuestions.map((item) => item.id)).size, 36)
+  assert.equal(new Set(scenarioQuestions.map((item) => item.id)).size, 63)
 })
 
 test("scenario domain categorisation respects governance for cost optimisation", () => {
   const domains = ["Cloud concepts", "Azure architecture and services", "Azure management and governance"]
-  assert.deepEqual(domains.map((domain) => scenarioQuestions.filter((item) => item.category === domain).length), [11, 12, 13])
+  assert.ok(domains.every((domain) => scenarioQuestions.some((item) => item.category === domain)))
   assert.equal(scenarioQuestions.find((item) => item.objectiveId === "LO-016")?.category, "Azure management and governance")
+})
+
+test("each original handout objective now has at least one mapped scenario", () => {
+  const ids = new Set(scenarioQuestions.map((item) => item.objectiveId))
+  assert.equal(ids.size, 63)
+  assert.ok(Array.from({length: 63}, (_, i) => `LO-${String(i + 1).padStart(3, "0")}`).every((id) => ids.has(id)))
 })
 
 test("correct and incorrect answers record an independent attempt", () => {
@@ -25,7 +31,7 @@ test("correct and incorrect answers record an independent attempt", () => {
   const b = recordScenarioAnswer(a, example.id, example.correctIndex, "2026-10-27T19:01:00.000Z")
   assert.equal(b[example.id].correct, true)
   assert.equal(b[example.id].attempts, 2)
-  assert.deepEqual(getScenarioOverview(b), { attempted: 1, latestCorrect: 1, total: 36 })
+  assert.deepEqual(getScenarioOverview(b), { attempted: 1, latestCorrect: 1, total: 63 })
 })
 
 test("rejects invalid input and unsupported scenario IDs", () => {

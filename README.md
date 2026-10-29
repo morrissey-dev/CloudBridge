@@ -16,6 +16,14 @@ CloudBridge brings learning and revision tools together in one platform, helping
 
 
 
+## V1.5 additions
+
+- **63 scenario questions**, one or more mapped to each of the 63 distinct original handout objectives; a single question does not prove mastery.
+- **Two guided, offline-simulated labs**: Azure Storage choices and network-access planning (four steps each). They do not access an Azure subscription or deploy resources.
+- **Six separate Azure Storage objectives** from the detailed notes / current AZ-900 guide, without altering the original handout objectives.
+- **Saved lab results** through `cloudbridge-lab-progress-v1`, included in backup/restore. Existing progress keys and question IDs remain unchanged.
+- Read [`docs/HOW-TO-UPGRADE-V1.5.md`](docs/HOW-TO-UPGRADE-V1.5.md) and [`docs/V1.5-RELEASE-NOTES.md`](docs/V1.5-RELEASE-NOTES.md) before applying the upgrade.
+
 ## V1.4 additions
 
 - **36 objective-linked scenarios**, with topic filters, review of incorrect latest answers, and navigation from the objectives tracker.
